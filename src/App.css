@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&display=swap');
+
 .App {
   text-align: center;
 }
@@ -34,5 +36,145 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+body {
+  background: linear-gradient(120deg, #e6f0fa 0%, #f8fafc 100%);
+  font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+  color: #1a2233;
+}
+
+h1, h2, h3, h4, h5, h6, .titre-playfair {
+  font-family: 'Playfair Display', serif !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.5px;
+}
+
+.card {
+  border-radius: 18px !important;
+  box-shadow: 0 6px 32px rgba(0,0,0,0.10);
+  border: none;
+  background: #fff;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 12px 36px rgba(0,0,0,0.13);
+}
+
+.btn-primary, .btn-outline-dark {
+  background: linear-gradient(90deg, #0a2342 60%, #1e90ff 100%);
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(30,60,60,0.10);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.btn-primary:hover, .btn-outline-dark:hover {
+  background: linear-gradient(90deg, #1e90ff 0%, #0a2342 100%);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(30,60,60,0.18);
+}
+
+.experience-slider-container {
+  background: #f8fafc;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  padding: 24px 0;
+}
+
+.experience-slide {
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+  overflow: hidden;
+  background: #fff;
+}
+
+/* Style de la barre d'infos bateau */
+.bateau-infos-bar {
+  margin: -32px auto 0 auto;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  max-width: 520px;
+  padding: 12px 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  position: relative;
+  z-index: 2;
+  top: 0;
+  background: #fff;
+  border-radius: 18px;
+  transition: all 0.2s;
+}
+.bateau-infos-bar span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  font-size: 18px;
+  color: #0a2342;
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 6px 14px;
+  box-shadow: 0 1px 4px rgba(30,60,60,0.06);
+}
+
+/* Responsive amélioré */
+@media (max-width: 900px) {
+  .bateau-infos-bar {
+    max-width: 98vw;
+    gap: 10px;
+    padding: 10px 6px;
+  }
+  .bateau-infos-bar span {
+    font-size: 15px;
+    padding: 5px 8px;
+  }
+}
+@media (max-width: 600px) {
+  .bateau-infos-bar {
+    margin: 18px auto 0 auto !important;
+    position: static !important;
+    max-width: 100% !important;
+    flex-wrap: wrap;
+    gap: 8px !important;
+    padding: 8px 2px;
+  }
+  .bateau-infos-bar span {
+    font-size: 13px;
+    padding: 4px 6px;
+    margin-bottom: 2px;
+  }
+  .location-date-field {
+    display: none !important;
+  }
+  .experience-slider-container {
+    padding: 0 2vw;
+  }
+  .experience-slide {
+    width: 100% !important;
+    max-width: 98vw;
+    height: 160px;
+    margin: 0 auto 16px auto;
+    border-radius: 16px;
+  }
+  .custom-ville-select {
+    font-size: 12px !important;
+    padding: 4px 8px !important;
+    min-width: 40px !important;
+  }
+  .btn.btn-primary {
+    font-size: 13px !important;
+    padding: 6px 16px !important;
+    min-width: 50px !important;
+  }
+  .services-section-card {
+    width: 98vw !important;
+    max-width: 98vw !important;
+    height: 140px !important;
+    border-radius: 14px !important;
+    margin-bottom: 18px !important;
   }
 }
