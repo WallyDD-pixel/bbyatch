@@ -169,7 +169,7 @@ export default function Confirmation() {
         createdAt: new Date()
       });
     }
-    fetch("https://bbyatch-2.onrender.com/create-checkout-session",", {
+    fetch("https://bbyatch-2.onrender.com/create-checkout-session", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
