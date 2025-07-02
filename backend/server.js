@@ -44,8 +44,8 @@ app.post("/create-checkout-session", async (req, res) => {
       mode: "payment",
       customer_email: email,
       metadata: { nom, dateDebut, heureDebut, dateFin, heureFin, prix, bateauId },
-      success_url: "https://bbyatch-frontend.vercel.app/felicitation?session_id={CHECKOUT_SESSION_ID}",
-      cancel_url: "https://bbyatch-frontend.vercel.app/confirmation?canceled=true", 
+      success_url: "https://bbyatch-d7af.vercel.app/felicitation?session_id={CHECKOUT_SESSION_ID}",
+      cancel_url: "https://bbyatch-d7af.vercel.app/confirmation?canceled=true", 
     });
     res.json({ url: session.url });
   } catch (err) {
