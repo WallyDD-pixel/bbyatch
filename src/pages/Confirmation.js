@@ -160,15 +160,7 @@ export default function Confirmation() {
       prix,
       bateauId: queryParams.get("bateauId") || null
     };
-    if (!user) {
-      await addDoc(collection(db, "userNoAuth"), {
-        nom,
-        prenom,
-        email,
-        ...infosReservation,
-        createdAt: new Date()
-      });
-    }
+    
     fetch("https://bbyatch-2.onrender.com/create-checkout-session", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
