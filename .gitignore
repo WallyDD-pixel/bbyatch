@@ -25,4 +25,3 @@ yarn-error.log*
 
 # Fichiers exclus du versioning
 backend/server.js
-src/pages/Confirmation.js
