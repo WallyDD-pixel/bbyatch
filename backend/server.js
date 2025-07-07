@@ -44,8 +44,8 @@ app.post("/create-checkout-session", async (req, res) => {
       mode: "payment",
       customer_email: email,
       metadata: { nom, dateDebut, heureDebut, dateFin, heureFin, prix, bateauId },
-      success_url: "http://localhost:3000/felicitation?session_id={CHECKOUT_SESSION_ID}",
-      cancel_url: "http://localhost:3000/confirmation?canceled=true",
+      success_url: "https://bbyatch-d7af.vercel.app/felicitation?session_id={CHECKOUT_SESSION_ID}",
+      cancel_url: "https://bbyatch-d7af.vercel.app/confirmation?canceled=true", 
     });
     res.json({ url: session.url });
   } catch (err) {
@@ -64,4 +64,5 @@ app.get("/checkout-session", async (req, res) => {
   }
 });
 
-app.listen(4242, () => console.log("Stripe backend démarré sur http://localhost:4242"));
+const PORT = process.env.PORT || 4242;
+app.listen(PORT, () => console.log(`Stripe backend démarré sur http://localhost:${PORT}`));

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase';
 import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaPlus, FaArrowLeft, FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export default function AdminBateaux() {
@@ -153,194 +153,720 @@ export default function AdminBateaux() {
   };
 
   return (
-    <div style={{ maxWidth: 900, margin: '40px auto', padding: 24, background: '#fff', borderRadius: 16, boxShadow: '0 2px 16px rgba(30,60,60,0.08)' }}>
-      <h2 style={{ textAlign: 'center', color: '#1e90ff', marginBottom: 32 }}>Gestion des bateaux</h2>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 18 }}>
-        {!showForm && (
-          <button onClick={() => setShowForm(true)} style={{ ...addBtnStyle, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 20 }}>+</span> Ajouter un bateau
-          </button>
-        )}
-      </div>
-      {!showForm && (
-        <>
-          {loading ? (
-            <div style={{ textAlign: 'center', margin: 30 }}>Chargement...</div>
-          ) : (
-            <div style={{ overflowX: 'auto', marginTop: 0 }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 15, background: '#fff' }}>
-                <thead>
-                  <tr style={{ background: '#e6f0fa' }}>
-                    <th style={thStyle} onClick={() => handleSort('nom')}>Nom {sortField === 'nom' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}</th>
-                    <th style={thStyle} onClick={() => handleSort('Ville')}>Ville {sortField === 'Ville' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}</th>
-                    <th style={thStyle} onClick={() => handleSort('moteur')}>Moteur {sortField === 'moteur' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}</th>
-                    <th style={thStyle} onClick={() => handleSort('carburant')}>Carburant {sortField === 'carburant' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}</th>
-                    <th style={thStyle} onClick={() => handleSort('places')}>Places {sortField === 'places' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}</th>
-                    <th style={thStyle} onClick={() => handleSort('prix')}>Prix {sortField === 'prix' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}</th>
-                    <th style={thStyle} onClick={() => handleSort('vitesse')}>Vitesse {sortField === 'vitesse' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}</th>
-                    <th style={thStyle}>Photos</th>
-                    <th style={thStyle}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sortedBateaux.map(b => (
-                    <tr key={b.id} style={{ borderBottom: '1px solid #e0e0e0' }}>
-                      <td style={tdStyle}>{b.nom}</td>
-                      <td style={tdStyle}>{b.Ville}</td>
-                      <td style={tdStyle}>{b.moteur}</td>
-                      <td style={tdStyle}>{b.carburant}</td>
-                      <td style={tdStyle}>{b.places}</td>
-                      <td style={tdStyle}>{b.prix}</td>
-                      <td style={tdStyle}>{b.vitesse}</td>
-                      <td style={tdStyle}>
-                        {b.photo && b.photo.length > 0 ? (
-                          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'center' }}>
-                            {b.photo.slice(0,3).map((url, i) => (
-                              <img key={i} src={url} alt="miniature" style={{ width: 90, height: 68, objectFit: 'cover', borderRadius: 8, border: '1.5px solid #e0e0e0', boxShadow: '0 1px 4px #0001', margin: '0 8px' }} />
-                            ))}
-                            {b.photo.length > 3 && <span style={{ fontSize: 13, color: '#888', marginLeft: 4 }}>+{b.photo.length-3}</span>}
-                          </div>
-                        ) : 'Aucune'}
-                      </td>
-                      <td style={tdStyle}>
-                        <button onClick={() => handleEdit(b)} style={editBtnStyle} title="Modifier">
-                          <FaEdit />
-                        </button>
-                        <button onClick={() => handleDelete(b.id)} style={deleteBtnStyle} title="Supprimer">
-                          <FaTrash />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+    <div style={{ 
+      minHeight: '100vh', 
+      background: '#1a1d23', 
+      color: '#e8eaed',
+      padding: '24px',
+      fontFamily: 'Inter, system-ui, sans-serif'
+    }}>
+      {/* Header avec le style du dashboard */}
+      <header style={{
+        background: '#2a2d35',
+        padding: '24px 32px',
+        borderRadius: '16px 16px 0 0',
+        border: '1px solid #374151',
+        borderBottom: 'none',
+        marginBottom: 0
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <div style={{
+              width: 48,
+              height: 48,
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#fff',
+              fontSize: 20,
+              fontWeight: 700
+            }}>
+              🚤
             </div>
+            <div>
+              <h1 style={{ 
+                margin: 0,
+                fontSize: 28,
+                fontWeight: 800,
+                color: '#e8eaed',
+                letterSpacing: '-0.5px'
+              }}>
+                Gestion des Bateaux
+              </h1>
+              <p style={{ 
+                margin: 0,
+                fontSize: 14,
+                color: '#9ca3af',
+                fontWeight: 500
+              }}>
+                Gérez votre flotte de bateaux
+              </p>
+            </div>
+          </div>
+          
+          {!showForm && (
+            <button 
+              onClick={() => setShowForm(true)} 
+              style={{
+                background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 12,
+                padding: '14px 24px',
+                fontSize: 16,
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                transition: 'all 0.2s',
+                boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
+                ':hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)'
+                }
+              }}
+            >
+              <FaPlus style={{ fontSize: 14 }} />
+              Ajouter un bateau
+            </button>
           )}
-        </>
-      )}
-      {showForm && (
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18, marginTop: 24 }}>
-          <input name="nom" value={form.nom} onChange={handleChange} placeholder="Nom du bateau" style={inputStyle} />
-          <input name="Ville" value={form.Ville} onChange={handleChange} placeholder="Ville" style={inputStyle} />
-          <input name="moteur" value={form.moteur} onChange={handleChange} placeholder="Moteur (chiffre)" type="number" style={inputStyle} />
-          <input name="carburant" value={form.carburant} onChange={handleChange} placeholder="Carburant (litres)" type="number" style={inputStyle} />
-          <input name="places" value={form.places} onChange={handleChange} placeholder="Places" type="number" style={inputStyle} />
-          <input name="prix" value={form.prix} onChange={handleChange} placeholder="Prix (€)" type="number" style={inputStyle} />
-          <input name="vitesse" value={form.vitesse} onChange={handleChange} placeholder="Vitesse (kn)" type="number" style={inputStyle} />
-          <div>
-            <label style={{ fontWeight: 600, color: '#0a2342' }}>Photos</label>
-            <input type="file" accept="image/*" onChange={handleFileUpload} style={{ marginBottom: 10 }} />
-            {form.photo.map((url, i) => (
-              <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 10, alignItems: 'center' }}>
-                {url && url.trim() !== '' && (
-                  <img src={url} alt="miniature" style={{ width: 90, height: 68, objectFit: 'cover', borderRadius: 8, border: '1.5px solid #e0e0e0', boxShadow: '0 1px 4px #0001', margin: '0 8px' }} />
-                )}
-                <input
-                  value={url}
-                  onChange={e => handlePhotoChange(i, e.target.value)}
-                  placeholder={`URL photo #${i + 1}`}
-                  style={{ ...inputStyle, flex: 1, minWidth: 180, display: 'none' }}
+        </div>
+      </header>
+
+      {/* Contenu principal */}
+      <main style={{
+        background: '#2a2d35',
+        border: '1px solid #374151',
+        borderTop: 'none',
+        borderRadius: '0 0 16px 16px',
+        padding: '32px',
+        minHeight: '600px'
+      }}>
+        {!showForm ? (
+          <>
+            {loading ? (
+              <div style={{ 
+                textAlign: 'center', 
+                padding: '80px 0',
+                color: '#9ca3af',
+                fontSize: 18
+              }}>
+                <div style={{
+                  width: 40,
+                  height: 40,
+                  border: '3px solid #374151',
+                  borderTop: '3px solid #3b82f6',
+                  borderRadius: '50%',
+                  margin: '0 auto 16px',
+                  animation: 'spin 1s linear infinite'
+                }}></div>
+                Chargement des bateaux...
+              </div>
+            ) : (
+              <div style={{ 
+                background: '#1e2126',
+                borderRadius: 12,
+                border: '1px solid #374151',
+                overflow: 'hidden'
+              }}>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ 
+                    width: '100%', 
+                    borderCollapse: 'collapse',
+                    fontSize: 14
+                  }}>
+                    <thead>
+                      <tr style={{ background: '#374151' }}>
+                        <th style={{
+                          ...modernThStyle,
+                          cursor: 'pointer',
+                          userSelect: 'none'
+                        }} onClick={() => handleSort('nom')}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            Nom
+                            {sortField === 'nom' ? (
+                              sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />
+                            ) : <FaSort style={{ opacity: 0.5 }} />}
+                          </div>
+                        </th>
+                        <th style={{
+                          ...modernThStyle,
+                          cursor: 'pointer',
+                          userSelect: 'none'
+                        }} onClick={() => handleSort('Ville')}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            Ville
+                            {sortField === 'Ville' ? (
+                              sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />
+                            ) : <FaSort style={{ opacity: 0.5 }} />}
+                          </div>
+                        </th>
+                        <th style={{
+                          ...modernThStyle,
+                          cursor: 'pointer',
+                          userSelect: 'none'
+                        }} onClick={() => handleSort('moteur')}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            Moteur
+                            {sortField === 'moteur' ? (
+                              sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />
+                            ) : <FaSort style={{ opacity: 0.5 }} />}
+                          </div>
+                        </th>
+                        <th style={{
+                          ...modernThStyle,
+                          cursor: 'pointer',
+                          userSelect: 'none'
+                        }} onClick={() => handleSort('carburant')}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            Carburant
+                            {sortField === 'carburant' ? (
+                              sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />
+                            ) : <FaSort style={{ opacity: 0.5 }} />}
+                          </div>
+                        </th>
+                        <th style={{
+                          ...modernThStyle,
+                          cursor: 'pointer',
+                          userSelect: 'none'
+                        }} onClick={() => handleSort('places')}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            Places
+                            {sortField === 'places' ? (
+                              sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />
+                            ) : <FaSort style={{ opacity: 0.5 }} />}
+                          </div>
+                        </th>
+                        <th style={{
+                          ...modernThStyle,
+                          cursor: 'pointer',
+                          userSelect: 'none'
+                        }} onClick={() => handleSort('prix')}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            Prix (€)
+                            {sortField === 'prix' ? (
+                              sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />
+                            ) : <FaSort style={{ opacity: 0.5 }} />}
+                          </div>
+                        </th>
+                        <th style={{
+                          ...modernThStyle,
+                          cursor: 'pointer',
+                          userSelect: 'none'
+                        }} onClick={() => handleSort('vitesse')}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            Vitesse (kn)
+                            {sortField === 'vitesse' ? (
+                              sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />
+                            ) : <FaSort style={{ opacity: 0.5 }} />}
+                          </div>
+                        </th>
+                        <th style={modernThStyle}>Photos</th>
+                        <th style={modernThStyle}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {sortedBateaux.map((b, idx) => (
+                        <tr key={b.id} style={{ 
+                          background: idx % 2 === 0 ? '#1e2126' : '#262a31',
+                          transition: 'all 0.2s',
+                          ':hover': {
+                            background: '#2d3139'
+                          }
+                        }}>
+                          <td style={modernTdStyle}>{b.nom}</td>
+                          <td style={modernTdStyle}>{b.Ville}</td>
+                          <td style={modernTdStyle}>{b.moteur}</td>
+                          <td style={modernTdStyle}>{b.carburant}</td>
+                          <td style={modernTdStyle}>{b.places}</td>
+                          <td style={modernTdStyle}>{b.prix}€</td>
+                          <td style={modernTdStyle}>{b.vitesse}</td>
+                          <td style={modernTdStyle}>
+                            {b.photo && b.photo.length > 0 ? (
+                              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center' }}>
+                                {b.photo.slice(0,3).map((url, i) => (
+                                  <img 
+                                    key={i} 
+                                    src={url} 
+                                    alt="miniature" 
+                                    style={{ 
+                                      width: 60, 
+                                      height: 45, 
+                                      objectFit: 'cover', 
+                                      borderRadius: 8, 
+                                      border: '1px solid #374151',
+                                      transition: 'transform 0.2s',
+                                      cursor: 'pointer'
+                                    }}
+                                    onMouseOver={(e) => e.target.style.transform = 'scale(1.1)'}
+                                    onMouseOut={(e) => e.target.style.transform = 'scale(1)'
+                                    }
+                                  />
+                                ))}
+                                {b.photo.length > 3 && (
+                                  <span style={{ 
+                                    fontSize: 12, 
+                                    color: '#9ca3af', 
+                                    alignSelf: 'center',
+                                    background: '#374151',
+                                    padding: '4px 8px',
+                                    borderRadius: 4
+                                  }}>
+                                    +{b.photo.length-3}
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <span style={{ color: '#6b7280', fontSize: 12 }}>Aucune photo</span>
+                            )}
+                          </td>
+                          <td style={modernTdStyle}>
+                            <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+                              <button 
+                                onClick={() => handleEdit(b)} 
+                                style={modernEditBtnStyle}
+                                title="Modifier"
+                              >
+                                <FaEdit />
+                              </button>
+                              <button 
+                                onClick={() => handleDelete(b.id)} 
+                                style={modernDeleteBtnStyle}
+                                title="Supprimer"
+                              >
+                                <FaTrash />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
+          /* Formulaire avec design moderne sombre */
+          <div style={{
+            background: '#1e2126',
+            borderRadius: 12,
+            border: '1px solid #374151',
+            padding: '32px'
+          }}>
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 16, 
+              marginBottom: 32,
+              paddingBottom: 24,
+              borderBottom: '1px solid #374151'
+            }}>
+              <button 
+                onClick={() => { setShowForm(false); setEditId(null); }}
+                style={{
+                  background: 'transparent',
+                  border: '1px solid #374151',
+                  color: '#9ca3af',
+                  borderRadius: 8,
+                  padding: '8px 12px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  transition: 'all 0.2s',
+                  ':hover': {
+                    background: '#374151',
+                    color: '#e8eaed'
+                  }
+                }}
+              >
+                <FaArrowLeft /> Retour
+              </button>
+              <h2 style={{ 
+                margin: 0,
+                fontSize: 24,
+                fontWeight: 700,
+                color: '#e8eaed'
+              }}>
+                {editId ? 'Modifier le bateau' : 'Ajouter un nouveau bateau'}
+              </h2>
+            </div>
+            
+            <form onSubmit={handleSubmit} style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+              gap: 24 
+            }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <label style={modernLabelStyle}>Nom du bateau</label>
+                <input 
+                  name="nom" 
+                  value={form.nom} 
+                  onChange={handleChange} 
+                  placeholder="Nom du bateau"
+                  style={modernInputStyle} 
                 />
-                <button type="button" onClick={() => removePhotoField(i)} style={removeBtnStyle} disabled={form.photo.length === 1}>Supprimer</button>
-                {i === form.photo.length - 1 && (
-                  <button type="button" onClick={addPhotoField} style={addBtnStyle}>Ajouter</button>
+              </div>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <label style={modernLabelStyle}>Ville</label>
+                <input 
+                  name="Ville" 
+                  value={form.Ville} 
+                  onChange={handleChange} 
+                  placeholder="Ville"
+                  style={modernInputStyle} 
+                />
+              </div>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <label style={modernLabelStyle}>Moteur</label>
+                <input 
+                  name="moteur" 
+                  value={form.moteur} 
+                  onChange={handleChange} 
+                  placeholder="Puissance moteur"
+                  type="number"
+                  style={modernInputStyle} 
+                />
+              </div>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <label style={modernLabelStyle}>Carburant (litres)</label>
+                <input 
+                  name="carburant" 
+                  value={form.carburant} 
+                  onChange={handleChange} 
+                  placeholder="Capacité carburant"
+                  type="number"
+                  style={modernInputStyle} 
+                />
+              </div>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <label style={modernLabelStyle}>Places</label>
+                <input 
+                  name="places" 
+                  value={form.places} 
+                  onChange={handleChange} 
+                  placeholder="Nombre de places"
+                  type="number"
+                  style={modernInputStyle} 
+                />
+              </div>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <label style={modernLabelStyle}>Prix (€)</label>
+                <input 
+                  name="prix" 
+                  value={form.prix} 
+                  onChange={handleChange} 
+                  placeholder="Prix de location"
+                  type="number"
+                  style={modernInputStyle} 
+                />
+              </div>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <label style={modernLabelStyle}>Vitesse (kn)</label>
+                <input 
+                  name="vitesse" 
+                  value={form.vitesse} 
+                  onChange={handleChange} 
+                  placeholder="Vitesse maximale"
+                  type="number"
+                  style={modernInputStyle} 
+                />
+              </div>
+              
+              <div style={{ gridColumn: '1 / -1' }}>
+                <label style={modernLabelStyle}>Photos</label>
+                <div style={{
+                  background: '#2a2d35',
+                  border: '2px dashed #374151',
+                  borderRadius: 8,
+                  padding: '24px',
+                  textAlign: 'center',
+                  marginBottom: 16
+                }}>
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleFileUpload}
+                    style={{
+                      background: '#3b82f6',
+                      color: '#fff',
+                      border: 'none',
+                      padding: '12px 24px',
+                      borderRadius: 8,
+                      cursor: 'pointer',
+                      fontSize: 14,
+                      fontWeight: 600
+                    }}
+                  />
+                  <p style={{ 
+                    color: '#9ca3af', 
+                    fontSize: 14, 
+                    margin: '16px 0 0 0' 
+                  }}>
+                    Glissez-déposez vos images ou cliquez pour sélectionner
+                  </p>
+                </div>
+                
+                {form.photo.length > 0 && (
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                    gap: 16,
+                    marginTop: 16
+                  }}>
+                    {form.photo.map((url, i) => (
+                      <div key={i} style={{
+                        background: '#2a2d35',
+                        border: '1px solid #374151',
+                        borderRadius: 8,
+                        padding: 16,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 12
+                      }}>
+                        {url && url.trim() !== '' && (
+                          <img 
+                            src={url} 
+                            alt="preview" 
+                            style={{ 
+                              width: '100%', 
+                              height: 120, 
+                              objectFit: 'cover', 
+                              borderRadius: 6,
+                              border: '1px solid #374151'
+                            }} 
+                          />
+                        )}
+                        <input
+                          value={url}
+                          onChange={e => handlePhotoChange(i, e.target.value)}
+                          placeholder={`URL photo #${i + 1}`}
+                          style={{
+                            ...modernInputStyle,
+                            fontSize: 12,
+                            padding: '8px 12px'
+                          }}
+                        />
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <button 
+                            type="button" 
+                            onClick={() => removePhotoField(i)}
+                            style={{
+                              background: '#dc2626',
+                              color: '#fff',
+                              border: 'none',
+                              borderRadius: 6,
+                              padding: '6px 12px',
+                              fontSize: 12,
+                              cursor: 'pointer',
+                              fontWeight: 600,
+                              flex: 1
+                            }}
+                            disabled={form.photo.length === 1}
+                          >
+                            Supprimer
+                          </button>
+                          {i === form.photo.length - 1 && (
+                            <button 
+                              type="button" 
+                              onClick={addPhotoField}
+                              style={{
+                                background: '#16a34a',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: 6,
+                                padding: '6px 12px',
+                                fontSize: 12,
+                                cursor: 'pointer',
+                                fontWeight: 600,
+                                flex: 1
+                              }}
+                            >
+                              Ajouter
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
-            ))}
+              
+              {error && (
+                <div style={{ 
+                  gridColumn: '1 / -1',
+                  background: '#dc2626',
+                  color: '#fff',
+                  padding: '12px 16px',
+                  borderRadius: 8,
+                  textAlign: 'center',
+                  fontSize: 14,
+                  fontWeight: 600
+                }}>
+                  {error}
+                </div>
+              )}
+              
+              {success && (
+                <div style={{ 
+                  gridColumn: '1 / -1',
+                  background: '#16a34a',
+                  color: '#fff',
+                  padding: '12px 16px',
+                  borderRadius: 8,
+                  textAlign: 'center',
+                  fontSize: 14,
+                  fontWeight: 600
+                }}>
+                  {success}
+                </div>
+              )}
+              
+              <div style={{ 
+                gridColumn: '1 / -1',
+                display: 'flex', 
+                gap: 16, 
+                justifyContent: 'flex-end',
+                marginTop: 16,
+                paddingTop: 24,
+                borderTop: '1px solid #374151'
+              }}>
+                <button 
+                  type="button" 
+                  onClick={() => { setShowForm(false); setEditId(null); }}
+                  style={{
+                    background: 'transparent',
+                    border: '1px solid #374151',
+                    color: '#9ca3af',
+                    borderRadius: 8,
+                    padding: '12px 24px',
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  Annuler
+                </button>
+                <button 
+                  type="submit"
+                  style={{
+                    background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 8,
+                    padding: '12px 32px',
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
+                  }}
+                >
+                  {editId ? 'Modifier le bateau' : 'Créer le bateau'}
+                </button>
+              </div>
+            </form>
           </div>
-          {error && <div style={{ color: 'red', textAlign: 'center' }}>{error}</div>}
-          {success && <div style={{ color: 'green', textAlign: 'center' }}>{success}</div>}
-          <div style={{ display: 'flex', gap: 12 }}>
-            <button type="submit" style={submitBtnStyle}>{editId ? 'Modifier' : 'Enregistrer'}</button>
-            <button type="button" style={cancelBtnStyle} onClick={() => { setShowForm(false); setEditId(null); }}>Annuler</button>
-          </div>
-        </form>
-      )}
+        )}
+      </main>
     </div>
   );
 }
 
-const inputStyle = {
-  padding: '12px 10px',
-  borderRadius: 8,
-  border: '1px solid #c0d0e0',
-  fontSize: 16,
-};
-const submitBtnStyle = {
-  background: 'linear-gradient(90deg, #1e90ff 60%, #4fc3f7 100%)',
-  color: '#fff',
-  border: 'none',
-  borderRadius: 8,
-  padding: '12px 0',
-  fontWeight: 700,
-  fontSize: 18,
-  cursor: 'pointer',
-  minWidth: 140,
-  boxShadow: '0 2px 8px #1e90ff22',
-  letterSpacing: 1,
-  transition: 'background 0.2s, box-shadow 0.2s',
-};
-const addBtnStyle = {
-  background: '#1e90ff',
-  color: '#fff',
-  border: 'none',
-  borderRadius: 6,
-  padding: '0 12px',
-  fontWeight: 700,
-  fontSize: 20,
-  cursor: 'pointer',
-};
-const removeBtnStyle = {
-  background: '#e74c3c',
-  color: '#fff',
-  border: 'none',
-  borderRadius: 6,
-  padding: '0 10px',
-  fontWeight: 700,
-  fontSize: 20,
-  cursor: 'pointer',
-};
-const cancelBtnStyle = {
-  background: '#888',
-  color: '#fff',
-  border: 'none',
-  borderRadius: 8,
-  padding: '12px 0',
+// Styles modernes pour le thème sombre
+const modernThStyle = {
+  padding: '16px 20px',
   fontWeight: 600,
-  fontSize: 17,
-  cursor: 'pointer',
-  minWidth: 120,
+  color: '#e8eaed',
+  fontSize: 13,
+  textTransform: 'uppercase',
+  letterSpacing: '0.5px',
+  borderBottom: '1px solid #374151',
+  textAlign: 'left'
 };
-const thStyle = { padding: 10, fontWeight: 700, color: '#0a2342', background: '#e6f0fa', borderBottom: '2px solid #b3c6e0' };
-const tdStyle = { padding: 8, textAlign: 'center', color: '#0a2342' };
-const editBtnStyle = {
-  background: 'linear-gradient(90deg, #e6f0fa 60%, #d0e8ff 100%)',
-  border: '2px solid #1e90ff',
-  borderRadius: '50%',
-  color: '#1e90ff',
-  fontSize: 20,
-  width: 40,
-  height: 40,
-  display: 'inline-flex',
+
+const modernTdStyle = {
+  padding: '16px 20px',
+  color: '#e8eaed',
+  fontSize: 14,
+  borderBottom: '1px solid #374151',
+  fontWeight: 500
+};
+
+const modernInputStyle = {
+  background: '#374151',
+  border: '1px solid #4b5563',
+  color: '#e8eaed',
+  borderRadius: 8,
+  padding: '12px 16px',
+  fontSize: 14,
+  transition: 'all 0.2s',
+  outline: 'none',
+  ':focus': {
+    borderColor: '#3b82f6',
+    background: '#404652'
+  }
+};
+
+const modernLabelStyle = {
+  color: '#e8eaed',
+  fontSize: 14,
+  fontWeight: 600,
+  marginBottom: 4
+};
+
+const modernEditBtnStyle = {
+  background: '#374151',
+  border: '1px solid #4b5563',
+  color: '#3b82f6',
+  borderRadius: 8,
+  padding: '8px 12px',
+  cursor: 'pointer',
+  transition: 'all 0.2s',
+  display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  margin: '0 4px',
-  cursor: 'pointer',
-  boxShadow: '0 2px 8px #1e90ff22',
-  transition: 'background 0.2s, border 0.2s, box-shadow 0.2s',
+  ':hover': {
+    background: '#4b5563',
+    borderColor: '#3b82f6'
+  }
 };
-const deleteBtnStyle = {
-  background: '#fff0f0',
-  border: '1.5px solid #e74c3c',
-  borderRadius: '50%',
-  color: '#e74c3c',
-  fontSize: 18,
-  width: 36,
-  height: 36,
-  display: 'inline-flex',
+
+const modernDeleteBtnStyle = {
+  background: '#374151',
+  border: '1px solid #4b5563',
+  color: '#dc2626',
+  borderRadius: 8,
+  padding: '8px 12px',
+  cursor: 'pointer',
+  transition: 'all 0.2s',
+  display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  margin: '0 4px',
-  cursor: 'pointer',
-  transition: 'background 0.2s, border 0.2s',
+  ':hover': {
+    background: '#4b5563',
+    borderColor: '#dc2626'
+  }
 };
+
+// Styles supprimés - remplacés par les styles modernes
+const inputStyle = modernInputStyle;
+const submitBtnStyle = {};
+const addBtnStyle = {};
+const removeBtnStyle = {};
+const cancelBtnStyle = {};
+const thStyle = modernThStyle;
+const tdStyle = modernTdStyle;
+const editBtnStyle = modernEditBtnStyle;
+const deleteBtnStyle = modernDeleteBtnStyle;

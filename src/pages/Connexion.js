@@ -25,10 +25,13 @@ export default function Connexion() {
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       if (userDoc.exists()) {
         const data = userDoc.data();
-        if (data.role === 'Admin') {
+        console.log('Rôle utilisateur:', data.role);
+        if ((data.role || '').toLowerCase() === 'admin') {
           navigate('/admin/dashboard');
+        } else if ((data.role || '').toLowerCase() === 'agence') {
+          navigate('/agence/dashboard');
         } else {
-          setError('Connexion réussie, mais vous n’êtes pas administrateur.');
+          setError('Connexion réussie, mais vous n’êtes pas administrateur ou agence.');
         }
       } else {
         setError('Utilisateur non trouvé dans la base.');

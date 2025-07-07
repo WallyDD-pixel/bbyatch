@@ -33,44 +33,44 @@ export default function AdminReservations() {
         <div>Chargement...</div>
       ) : (
         <div className="table-responsive">
-          <table className="table table-bordered align-middle text-center" style={{ boxShadow: '0 4px 24px #1e90ff22', borderRadius: 16, overflow: 'hidden', background: '#fafdff' }}>
-            <thead className="table-light" style={{ background: 'linear-gradient(90deg, #e6f0fa 60%, #fff 100%)', fontWeight: 700, fontSize: 16, color: '#1e90ff' }}>
+          <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, fontSize: 15, background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 16px #1e90ff22' }}>
+            <thead style={{ background: 'linear-gradient(90deg, #e6f0fa 60%, #fff 100%)', fontWeight: 700, fontSize: 16, color: '#1e90ff' }}>
               <tr>
-                <th>Bateau</th>
-                <th>Date début</th>
-                <th>Heure début</th>
-                <th>Date fin</th>
-                <th>Heure fin</th>
-                <th>Montant</th>
-                <th>Devise</th>
-                <th>Nom</th>
-                <th>Prénom</th>
-                <th>Email</th>
-                <th>Téléphone</th>
-                <th>Créée le</th>
-                <th>Paiement complet</th>
-                <th>Statut paiement complet</th>
-                <th>Actions</th>
+                <th style={{ padding: 12, fontWeight: 800, color: '#1976d2', background: 'none', borderBottom: '2.5px solid #b3c6e0', fontSize: 16, letterSpacing: 0.5, textAlign: 'center' }}>Bateau</th>
+                <th style={{ padding: 12, fontWeight: 800, color: '#1976d2', background: 'none', borderBottom: '2.5px solid #b3c6e0', fontSize: 16, letterSpacing: 0.5, textAlign: 'center' }}>Date début</th>
+                <th style={{ padding: 12, fontWeight: 800, color: '#1976d2', background: 'none', borderBottom: '2.5px solid #b3c6e0', fontSize: 16, letterSpacing: 0.5, textAlign: 'center' }}>Heure début</th>
+                <th style={{ padding: 12, fontWeight: 800, color: '#1976d2', background: 'none', borderBottom: '2.5px solid #b3c6e0', fontSize: 16, letterSpacing: 0.5, textAlign: 'center' }}>Date fin</th>
+                <th style={{ padding: 12, fontWeight: 800, color: '#1976d2', background: 'none', borderBottom: '2.5px solid #b3c6e0', fontSize: 16, letterSpacing: 0.5, textAlign: 'center' }}>Heure fin</th>
+                <th style={{ padding: 12, fontWeight: 800, color: '#1976d2', background: 'none', borderBottom: '2.5px solid #b3c6e0', fontSize: 16, letterSpacing: 0.5, textAlign: 'center' }}>Montant</th>
+                <th style={{ padding: 12, fontWeight: 800, color: '#1976d2', background: 'none', borderBottom: '2.5px solid #b3c6e0', fontSize: 16, letterSpacing: 0.5, textAlign: 'center' }}>Devise</th>
+                <th style={{ padding: 12, fontWeight: 800, color: '#1976d2', background: 'none', borderBottom: '2.5px solid #b3c6e0', fontSize: 16, letterSpacing: 0.5, textAlign: 'center' }}>Nom</th>
+                <th style={{ padding: 12, fontWeight: 800, color: '#1976d2', background: 'none', borderBottom: '2.5px solid #b3c6e0', fontSize: 16, letterSpacing: 0.5, textAlign: 'center' }}>Prénom</th>
+                <th style={{ padding: 12, fontWeight: 800, color: '#1976d2', background: 'none', borderBottom: '2.5px solid #b3c6e0', fontSize: 16, letterSpacing: 0.5, textAlign: 'center' }}>Email</th>
+                <th style={{ padding: 12, fontWeight: 800, color: '#1976d2', background: 'none', borderBottom: '2.5px solid #b3c6e0', fontSize: 16, letterSpacing: 0.5, textAlign: 'center' }}>Téléphone</th>
+                <th style={{ padding: 12, fontWeight: 800, color: '#1976d2', background: 'none', borderBottom: '2.5px solid #b3c6e0', fontSize: 16, letterSpacing: 0.5, textAlign: 'center' }}>Créée le</th>
+                <th style={{ padding: 12, fontWeight: 800, color: '#1976d2', background: 'none', borderBottom: '2.5px solid #b3c6e0', fontSize: 16, letterSpacing: 0.5, textAlign: 'center' }}>Paiement complet</th>
+                <th style={{ padding: 12, fontWeight: 800, color: '#1976d2', background: 'none', borderBottom: '2.5px solid #b3c6e0', fontSize: 16, letterSpacing: 0.5, textAlign: 'center' }}>Statut paiement complet</th>
+                <th style={{ padding: 12, fontWeight: 800, color: '#1976d2', background: 'none', borderBottom: '2.5px solid #b3c6e0', fontSize: 16, letterSpacing: 0.5, textAlign: 'center' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {reservations.map(r => (
-                <tr key={r.id}>
-                  <td>{r.bateauNom || bateauxMap[r.bateauId] || r.bateauId || <span className="text-muted">-</span>}</td>
-                  <td>{r.dateDebut || <span className="text-muted">-</span>}</td>
-                  <td>{r.heureDebut || <span className="text-muted">-</span>}</td>
-                  <td>{r.dateFin || <span className="text-muted">-</span>}</td>
-                  <td>{r.heureFin || <span className="text-muted">-</span>}</td>
-                  <td>{r.montant ? r.montant : r.prix || <span className="text-muted">-</span>}</td>
-                  <td>{r.devise ? r.devise.toUpperCase() : <span className="text-muted">-</span>}</td>
-                  <td>{r.nom || <span className="text-muted">-</span>}</td>
-                  <td>{r.prenom || <span className="text-muted">-</span>}</td>
-                  <td>{r.email || <span className="text-muted">-</span>}</td>
-                  <td>{r.phone || <span className="text-muted">-</span>}</td>
-                  <td>{r.createdAt && r.createdAt.toDate ? r.createdAt.toDate().toLocaleString() : (r.createdAt ? new Date(r.createdAt).toLocaleString() : <span className="text-muted">-</span>)}</td>
-                  <td>{r.statusComplet === true ? <span style={{ color: '#1bbf4c', fontWeight: 700 }}>Payé</span> : <span style={{ color: '#e67e22', fontWeight: 700 }}>Non payé</span>}</td>
-                  <td>{r.statusComplet === true ? 'Validé' : 'En attente'}</td>
-                  <td>
+              {reservations.map((r, idx) => (
+                <tr key={r.id} style={{ background: idx % 2 === 0 ? '#f8fbff' : '#fff', borderBottom: '2px solid #e6f0fa', transition: 'background 0.2s' }}>
+                  <td style={{ padding: 10, textAlign: 'center', color: '#0a2342', fontSize: 15, fontWeight: 500 }}>{r.bateauNom || bateauxMap[r.bateauId] || r.bateauId || <span className="text-muted">-</span>}</td>
+                  <td style={{ padding: 10, textAlign: 'center', color: '#0a2342', fontSize: 15, fontWeight: 500 }}>{r.dateDebut || <span className="text-muted">-</span>}</td>
+                  <td style={{ padding: 10, textAlign: 'center', color: '#0a2342', fontSize: 15, fontWeight: 500 }}>{r.heureDebut || <span className="text-muted">-</span>}</td>
+                  <td style={{ padding: 10, textAlign: 'center', color: '#0a2342', fontSize: 15, fontWeight: 500 }}>{r.dateFin || <span className="text-muted">-</span>}</td>
+                  <td style={{ padding: 10, textAlign: 'center', color: '#0a2342', fontSize: 15, fontWeight: 500 }}>{r.heureFin || <span className="text-muted">-</span>}</td>
+                  <td style={{ padding: 10, textAlign: 'center', color: '#0a2342', fontSize: 15, fontWeight: 500 }}>{r.montant ? r.montant : r.prix || <span className="text-muted">-</span>}</td>
+                  <td style={{ padding: 10, textAlign: 'center', color: '#0a2342', fontSize: 15, fontWeight: 500 }}>{r.devise ? r.devise.toUpperCase() : <span className="text-muted">-</span>}</td>
+                  <td style={{ padding: 10, textAlign: 'center', color: '#0a2342', fontSize: 15, fontWeight: 500 }}>{r.nom || <span className="text-muted">-</span>}</td>
+                  <td style={{ padding: 10, textAlign: 'center', color: '#0a2342', fontSize: 15, fontWeight: 500 }}>{r.prenom || <span className="text-muted">-</span>}</td>
+                  <td style={{ padding: 10, textAlign: 'center', color: '#0a2342', fontSize: 15, fontWeight: 500 }}>{r.email || <span className="text-muted">-</span>}</td>
+                  <td style={{ padding: 10, textAlign: 'center', color: '#0a2342', fontSize: 15, fontWeight: 500 }}>{r.phone || <span className="text-muted">-</span>}</td>
+                  <td style={{ padding: 10, textAlign: 'center', color: '#0a2342', fontSize: 15, fontWeight: 500 }}>{r.createdAt && r.createdAt.toDate ? r.createdAt.toDate().toLocaleString() : (r.createdAt ? new Date(r.createdAt).toLocaleString() : <span className="text-muted">-</span>)}</td>
+                  <td style={{ padding: 10, textAlign: 'center', fontWeight: 700 }}>{r.statusComplet === true ? <span style={{ color: '#1bbf4c' }}>Payé</span> : <span style={{ color: '#e67e22' }}>Non payé</span>}</td>
+                  <td style={{ padding: 10, textAlign: 'center', fontWeight: 700 }}>{r.statusComplet === true ? 'Validé' : 'En attente'}</td>
+                  <td style={{ padding: 10, textAlign: 'center' }}>
                     <button className="btn btn-outline-primary btn-sm" style={{ borderRadius: 10, fontWeight: 600 }} onClick={() => { setSelectedReservation(r); setShowModal(true); }}>Gérer</button>
                   </td>
                 </tr>

@@ -1,188 +1,327 @@
-import React, { useState } from "react";
-import { FaMapMarkerAlt, FaRegCalendarAlt, FaRegClock } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { db } from "../firebase";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { MapPin, CalendarDays, Filter } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import "./LocationSearch.css";
+import fr from "date-fns/locale/fr"; // Import de la locale française
 
-export default function LocationSearch({ villes, ville, setVille }) {
-  const [dateDebut, setDateDebut] = useState("");
-  const [heureDebut, setHeureDebut] = useState("");
-  const [dateFin, setDateFin] = useState("");
-  const [heureFin, setHeureFin] = useState("");
+export default function LocationSearch() {
+  const [villes, setVilles] = useState([]);
+  const [selectedVille, setSelectedVille] = useState("");
+  const [dateDepart, setDateDepart] = useState(null);
+  const [heureDepart, setHeureDepart] = useState(null);
+  const [dateRetour, setDateRetour] = useState(null);
+  const [heureRetour, setHeureRetour] = useState(null);
+  const [disponibilites, setDisponibilites] = useState([]);
+  const [datesDepart, setDatesDepart] = useState([]); // Dates de début (start)
+  const [datesRetour, setDatesRetour] = useState([]); // Dates de fin (end)
   const navigate = useNavigate();
 
-  async function handleSearch(e) {
-    e.preventDefault();
-    if (!ville) return;
-    const params = new URLSearchParams({
-      ville,
-      dateDebut,
-      heureDebut,
-      dateFin,
-      heureFin
-    });
-    navigate(`/search-results?${params.toString()}`);
-  }
+  useEffect(() => {
+    const fetchVilles = async () => {
+      try {
+        const villeCollection = collection(db, "villes");
+        const villeSnapshot = await getDocs(villeCollection);
+        const villeList = villeSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setVilles(villeList);
+      } catch (error) {
+        console.error("Erreur lors du chargement des villes :", error);
+      }
+    };
+    fetchVilles();
+  }, []);
 
-  // Fonction utilitaire pour le blur
-  function handleBlur(e) {
-    e.target.style.boxShadow = '0 2px 8px rgba(0,0,0,0.07)';
-  }
+  useEffect(() => {
+    const fetchDisponibilites = async () => {
+      if (!selectedVille) return;
+
+      try {
+        const bateauxRef = collection(db, "bateaux");
+        const q = query(bateauxRef, where("Ville", "==", selectedVille));
+        const snapshot = await getDocs(q);
+
+        const allDisponibilites = [];
+        const startDates = []; // Dates de start
+        const endDates = [];   // Dates de end
+
+        console.log(`=== CALENDRIER: Chargement des disponibilités pour ${selectedVille} ===`);
+        console.log(`Nombre de bateaux trouvés: ${snapshot.docs.length}`);
+
+        // Parcourir chaque document bateau
+        snapshot.docs.forEach((doc) => {
+          const bateauData = doc.data();
+          const bateauId = doc.id;
+          
+          console.log(`\n🚤 Bateau: ${bateauData.nom || 'Sans nom'} (ID: ${bateauId})`);
+          
+          // Vérifier si le bateau a un champ disponibilites
+          if (!bateauData.disponibilites) {
+            console.log(`  ❌ Aucun champ 'disponibilites' pour ce bateau`);
+            return;
+          }
+          
+          // Vérifier si disponibilites est un tableau
+          if (!Array.isArray(bateauData.disponibilites)) {
+            console.log(`  ❌ Le champ 'disponibilites' n'est pas un tableau:`, typeof bateauData.disponibilites);
+            return;
+          }
+          
+          // Vérifier si le tableau est vide
+          if (bateauData.disponibilites.length === 0) {
+            console.log(`  ⚠️ Tableau des disponibilités vide`);
+            return;
+          }
+          
+          console.log(`  ✅ ${bateauData.disponibilites.length} disponibilité(s) trouvée(s)`);
+          
+          // Parcourir chaque disponibilité du bateau
+          bateauData.disponibilites.forEach((dispo, index) => {
+            console.log(`\n    📅 Disponibilité ${index + 1}:`);
+            
+            // Vérifier la structure de la disponibilité
+            if (!dispo.start || !dispo.end) {
+              console.log(`      ❌ Disponibilité incomplète - start: ${dispo.start}, end: ${dispo.end}`);
+              return;
+            }
+            
+            try {
+              const start = new Date(dispo.start);
+              const end = new Date(dispo.end);
+              
+              // Vérifier si les dates sont valides
+              if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+                console.log(`      ❌ Dates invalides - start: ${dispo.start}, end: ${dispo.end}`);
+                return;
+              }
+              
+              // Vérifier la logique des dates
+              if (start >= end) {
+                console.log(`      ❌ Date de début >= date de fin`);
+                return;
+              }
+              
+              console.log(`      ✅ ${start.toLocaleString()} à ${end.toLocaleString()}`);
+              
+              // Ajouter à la liste des disponibilités
+              allDisponibilites.push({ 
+                start, 
+                end, 
+                bateauId,
+                bateauNom: bateauData.nom || 'Sans nom',
+                bateauPrix: bateauData.prix || 0
+              });
+
+              // Extraire les dates de début et de fin
+              const startDate = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+              const endDate = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+              
+              // Ajouter la date de START pour le calendrier de départ
+              startDates.push(new Date(startDate));
+              console.log(`        → Date DÉPART ajoutée: ${startDate.toDateString()}`);
+              
+              // Ajouter la date de END pour le calendrier de retour
+              endDates.push(new Date(endDate));
+              console.log(`        → Date RETOUR ajoutée: ${endDate.toDateString()}`);
+              
+            } catch (error) {
+              console.log(`      ❌ Erreur lors du traitement de la disponibilité:`, error.message);
+            }
+          });
+        });
+
+        // Créer les listes uniques des dates
+        const uniqueStartDates = Array.from(
+          new Set(startDates.map((d) => d.toDateString()))
+        ).map((dateStr) => new Date(dateStr));
+
+        const uniqueEndDates = Array.from(
+          new Set(endDates.map((d) => d.toDateString()))
+        ).map((dateStr) => new Date(dateStr));
+
+        console.log(`\n=== CALENDRIER RÉSUMÉ ===`);
+        console.log(`${allDisponibilites.length} disponibilités totales trouvées`);
+        console.log(`${uniqueStartDates.length} dates de DÉPART disponibles`);
+        console.log(`${uniqueEndDates.length} dates de RETOUR disponibles`);
+
+        setDisponibilites(allDisponibilites);
+        setDatesDepart(uniqueStartDates);
+        setDatesRetour(uniqueEndDates);
+        
+      } catch (error) {
+        console.error("❌ Erreur lors du chargement des disponibilités :", error);
+      }
+    };
+
+    fetchDisponibilites();
+  }, [selectedVille]);
+
+  const getHeuresDisponibles = (selectedDate) => {
+    const heures = [];
+
+    disponibilites.forEach(({ start, end }) => {
+      const sameDay =
+        selectedDate &&
+        start.toDateString() === selectedDate.toDateString();
+
+      if (sameDay) {
+        let current = new Date(start);
+        while (current <= end) {
+          heures.push(new Date(current));
+          current.setMinutes(current.getMinutes() + 30);
+        }
+      }
+    });
+
+    return heures;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!selectedVille || !dateDepart || !heureDepart || !dateRetour || !heureRetour) {
+      alert("Merci de remplir tous les champs.");
+      return;
+    }
+
+    // Fonction pour formater la date sans problème de fuseau horaire
+    const formatDate = (d) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+    
+    const formatHeure = (d) => d.toTimeString().slice(0, 5);
+
+    const queryString = new URLSearchParams({
+      ville: selectedVille,
+      dateDebut: formatDate(dateDepart),
+      heureDebut: formatHeure(heureDepart),
+      dateFin: formatDate(dateRetour),
+      heureFin: formatHeure(heureRetour),
+    }).toString();
+
+    navigate(`/search-results?${queryString}`);
+  };
 
   return (
-    <div
-      style={{
-        background: "rgba(255,255,255,0.85)",
-        borderRadius: 40,
-        display: "inline-block",
-        padding: "40px 30px",
-        marginTop: 40,
-        boxShadow: "0 4px 24px rgba(0,0,0,0.07)",
-        maxWidth: 1200,
-        width: "90%",
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
-        transition: "box-shadow 0.2s, top 0.2s",
-      }}
-    >
-      <h1 className="display-4 fw-bold mb-4">Trouvez le bateau de vos rêves</h1>
-      <form onSubmit={handleSearch} className="d-flex flex-column align-items-center">
-        <div className="d-flex justify-content-center mb-4">
-          <div
-            className="bg-white rounded-pill shadow-sm p-2 d-flex flex-wrap align-items-center w-100"
-            style={{
-              maxWidth: "100%",
-              minWidth: 0,
-              gap: 10,
-              boxShadow: "0 6px 24px rgba(0,0,0,0.10)",
-              border: "1.5px solid #e0e0e0",
-              background: "rgba(255,255,255,0.96)",
-              borderRadius: 200,
-              width: "100%",
+    <form className="search-bar-modern" onSubmit={handleSubmit}>
+      <div className="search-item">
+        <MapPin className="search-icon" />
+        <div className="search-labels">
+          <label>Destination</label>
+          <select
+            value={selectedVille}
+            onChange={(e) => {
+              setSelectedVille(e.target.value);
+              setDateDepart(null);
+              setDateRetour(null);
+              setHeureDepart(null);
+              setHeureRetour(null);
             }}
+            className="styled-input"
           >
-            {/* Champ Lieu */}
-            <div className="d-flex align-items-center bg-light rounded-pill px-2 py-1 me-2" style={{ minWidth: 140 }}>
-              <span
-                className="bg-white rounded-circle d-flex align-items-center justify-content-center me-2"
-                style={{ width: 28, height: 28, boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}
-              >
-                <FaMapMarkerAlt size={14} color="#666" />
-              </span>
-              <select
-                className="form-select border-0 bg-transparent custom-ville-select"
-                style={{
-                  fontWeight: 500,
-                  fontSize: 13,
-                  minWidth: 60,
-                  padding: "6px 18px 6px 10px",
-                  borderRadius: 20,
-                  background: "#f8f9fa",
-                  color: "#333",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.07)",
-                  transition: "box-shadow 0.2s, border-color 0.2s",
-                  outline: "none",
-                  cursor: "pointer"
-                }}
-                value={ville}
-                onChange={e => setVille(e.target.value)}
-                onFocus={e => e.target.style.boxShadow = '0 0 0 2px #0d6efd44'}
-                onBlur={handleBlur}
-              >
-                <option value="">Choisissez une ville</option>
-                {villes.map((v, i) => (
-                  <option key={i} value={v}>{v}</option>
-                ))}
-              </select>
-            </div>
-            {/* Champ Début */}
-            <div
-              className="d-flex align-items-center bg-light rounded-pill px-2 py-1 me-2 location-date-field"
-              style={{ minWidth: 100 }}
-            >
-              <span
-                className="bg-white rounded-circle d-flex align-items-center justify-content-center me-2"
-                style={{ width: 28, height: 28, boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}
-              >
-                <FaRegCalendarAlt size={14} color="#666" />
-              </span>
-              <input
-                type="date"
-                className="form-control border-0 bg-transparent"
-                style={{ fontWeight: 500, fontSize: 13, minWidth: 40, padding: "2px 4px" }}
-                value={dateDebut}
-                onChange={e => setDateDebut(e.target.value)}
-                onBlur={handleBlur}
-              />
-            </div>
-            {/* Champ Heure Début */}
-            <div className="d-flex align-items-center bg-light rounded-pill px-2 py-1 me-2" style={{ minWidth: 70 }}>
-              <span
-                className="bg-white rounded-circle d-flex align-items-center justify-content-center me-2"
-                style={{ width: 28, height: 28, boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}
-              >
-                <FaRegClock size={14} color="#666" />
-              </span>
-              <input
-                type="time"
-                className="form-control border-0 bg-transparent"
-                style={{ fontWeight: 500, fontSize: 13, minWidth: 30, padding: "2px 4px" }}
-                step="3600"
-                value={heureDebut}
-                onChange={e => setHeureDebut(e.target.value)}
-              />
-            </div>
-            {/* Champ Fin */}
-            <div className="d-flex align-items-center bg-light rounded-pill px-2 py-1 me-2" style={{ minWidth: 100 }}>
-              <span
-                className="bg-white rounded-circle d-flex align-items-center justify-content-center me-2"
-                style={{ width: 28, height: 28, boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}
-              >
-                <FaRegCalendarAlt size={14} color="#666" />
-              </span>
-              <input
-                type="date"
-                className="form-control border-0 bg-transparent"
-                style={{ fontWeight: 500, fontSize: 13, minWidth: 40, padding: "2px 4px" }}
-                value={dateFin}
-                onChange={e => setDateFin(e.target.value)}
-                onBlur={handleBlur}
-              />
-            </div>
-            {/* Champ Heure Fin */}
-            <div className="d-flex align-items-center bg-light rounded-pill px-2 py-1 me-2" style={{ minWidth: 70 }}>
-              <span
-                className="bg-white rounded-circle d-flex align-items-center justify-content-center me-2"
-                style={{ width: 28, height: 28, boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}
-              >
-                <FaRegClock size={14} color="#666" />
-              </span>
-              <input
-                type="time"
-                className="form-control border-0 bg-transparent"
-                style={{ fontWeight: 500, fontSize: 13, minWidth: 30, padding: "2px 4px" }}
-                step="3600"
-                value={heureFin}
-                onChange={e => setHeureFin(e.target.value)}
-              />
-            </div>
-            {/* Bouton */}
-            <button type="submit" className="btn btn-primary rounded-pill px-3 ms-2" style={{ minWidth: 70, fontSize: 14 }}>
-              Rechercher
-            </button>
-          </div>
+            <option value="">Choisissez une ville</option>
+            {villes.map((ville) => (
+              <option key={ville.id} value={ville.nom}>
+                {ville.nom}
+              </option>
+            ))}
+          </select>
         </div>
-      </form>
-      {/* Résultats */}
-      {/* (On n'affiche plus les résultats ici, ils sont sur la page SearchResults) */}
-    </div>
+      </div>
+
+      <div className="search-item">
+        <CalendarDays className="search-icon" />
+        <div className="search-labels">
+          <label>Départ</label>
+          <DatePicker
+            selected={dateDepart}
+            onChange={(date) => {
+              setDateDepart(date);
+              setHeureDepart(null);
+            }}
+            placeholderText="Date de départ"
+            includeDates={datesDepart}
+            locale={fr}
+            dateFormat="dd/MM/yyyy"
+            dayClassName={(date) =>
+              datesDepart.some(
+                (d) => d.toDateString() === date.toDateString()
+              )
+                ? "available-day"
+                : undefined
+            }
+            className="styled-input"
+          />
+          {dateDepart && (
+            <DatePicker
+              selected={heureDepart}
+              onChange={(time) => setHeureDepart(time)}
+              showTimeSelect
+              showTimeSelectOnly
+              timeIntervals={30}
+              timeCaption="Heure"
+              dateFormat="HH:mm"
+              locale={fr}
+              includeTimes={getHeuresDisponibles(dateDepart)}
+              placeholderText="Heure de départ"
+              className="styled-input"
+            />
+          )}
+        </div>
+      </div>
+
+      <div className="search-item">
+        <CalendarDays className="search-icon" />
+        <div className="search-labels">
+          <label>Retour</label>
+          <DatePicker
+            selected={dateRetour}
+            onChange={(date) => {
+              setDateRetour(date);
+              setHeureRetour(null);
+            }}
+            placeholderText="Date de retour"
+            includeDates={datesRetour}
+            locale={fr}
+            dateFormat="dd/MM/yyyy"
+            dayClassName={(date) =>
+              datesRetour.some(
+                (d) => d.toDateString() === date.toDateString()
+              )
+                ? "available-day"
+                : undefined
+            }
+            className="styled-input"
+          />
+          {dateRetour && (
+            <DatePicker
+              selected={heureRetour}
+              onChange={(time) => setHeureRetour(time)}
+              showTimeSelect
+              showTimeSelectOnly
+              timeIntervals={30}
+              timeCaption="Heure"
+              dateFormat="HH:mm"
+              locale={fr}
+              includeTimes={getHeuresDisponibles(dateRetour)}
+              placeholderText="Heure de retour"
+              className="styled-input"
+            />
+          )}
+        </div>
+      </div>
+
+      <button type="submit" className="search-btn-icon" title="Rechercher">
+        <Filter size={20} />
+      </button>
+    </form>
   );
 }
-
-/*
-Ajoute ce CSS dans App.css ou index.css :
-@media (max-width: 600px) {
-  .location-date-field {
-    display: none !important;
-  }
-}
-*/

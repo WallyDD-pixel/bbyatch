@@ -1,31 +1,42 @@
-// Dashboard d'administration avec menu latéral et responsive
+// Dashboard d'administration avec menu latéral et responsive - Style moderne cohérent
 import React, { useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
-import { FaBars, FaCity, FaShip, FaCog, FaUserFriends, FaSignOutAlt, FaClipboardList } from 'react-icons/fa';
+import { FaBars, FaCity, FaShip, FaCog, FaUserFriends, FaSignOutAlt, FaClipboardList, FaChevronDown, FaChevronUp, FaCalendarAlt } from 'react-icons/fa';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase';
 
 export default function DashboardAdmin() {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(true);
+  const [settingsDropdown, setSettingsDropdown] = useState(false);
+
+  // Liste des sous-pages de paramètres
+  const settingsLinks = [
+    { to: '/admin/dashboard/settings', label: 'Paramètres généraux' },
+    { to: '/admin/dashboard/settings/galerie-home', label: 'Galerie d\'accueil' },
+    { to: '/admin/dashboard/settings/homepage', label: 'Homepage' },
+    { to: '/admin/dashboard/settings/presentation', label: 'Présentation' },
+    { to: '/admin/dashboard/settings/services', label: 'Services' },
+  ];
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#f4f8fb' }}>
-      {/* Menu latéral */}
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#1a1d23' }}>
+      {/* Sidebar */}
       <aside
         style={{
-          width: menuOpen ? 220 : 60,
-          background: '#1e90ff',
-          color: '#fff',
-          transition: 'width 0.2s',
+          width: menuOpen ? 260 : 70,
+          background: '#2a2d35',
+          color: '#e8eaed',
+          transition: 'width 0.25s ease',
           minHeight: '100vh',
           position: 'fixed',
           zIndex: 100,
           top: 0,
           left: 0,
-          boxShadow: '2px 0 12px rgba(30,60,60,0.08)',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: menuOpen ? 'flex-start' : 'center',
+          border: '1px solid #374151',
         }}
       >
         <button
@@ -33,61 +44,158 @@ export default function DashboardAdmin() {
           style={{
             background: 'none',
             border: 'none',
-            color: '#fff',
-            fontSize: 28,
-            margin: 18,
+            color: '#3b82f6',
+            fontSize: 24,
+            margin: 20,
             cursor: 'pointer',
             alignSelf: menuOpen ? 'flex-end' : 'center',
+            transition: 'all 0.3s ease',
+            padding: '8px',
+            borderRadius: '8px',
           }}
           aria-label="Ouvrir/fermer le menu"
+          onMouseEnter={(e) => {
+            e.target.style.background = '#374151';
+            e.target.style.color = '#60a5fa';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = 'none';
+            e.target.style.color = '#3b82f6';
+          }}
         >
           <FaBars />
         </button>
-        <nav style={{ width: '100%', marginTop: 30, display: 'flex', flexDirection: 'column', gap: 18 }}>
-          <Link to="/admin/dashboard/users" style={menuLinkStyle(menuOpen)}>
-            <FaUserFriends style={{ marginRight: menuOpen ? 12 : 0, fontSize: 22 }} />
-            {menuOpen && 'Utilisateurs'}
-          </Link>
-          <Link to="/admin/dashboard/bateaux" style={menuLinkStyle(menuOpen)}>
-            <FaShip style={{ marginRight: menuOpen ? 12 : 0, fontSize: 22 }} />
-            {menuOpen && 'Bateaux'}
-          </Link>
-          <Link to="/admin/dashboard/reservations" style={menuLinkStyle(menuOpen)}>
-            <FaClipboardList style={{ marginRight: menuOpen ? 12 : 0, fontSize: 22 }} />
-            {menuOpen && 'Réservations'}
-          </Link>
-          <Link to="/admin/dashboard/villes" style={menuLinkStyle(menuOpen)}>
-            <FaCity style={{ marginRight: menuOpen ? 12 : 0, fontSize: 22 }} />
-            {menuOpen && 'Gérer les villes'}
-          </Link>
-          <Link to="/admin/dashboard/settings" style={menuLinkStyle(menuOpen)}>
-            <FaCog style={{ marginRight: menuOpen ? 12 : 0, fontSize: 22 }} />
-            {menuOpen && 'Paramètres'}
-          </Link>
+        
+        <div style={{ width: '100%', textAlign: 'center', marginBottom: 20 }}>
+          {menuOpen && (
+            <span style={{ 
+              fontWeight: 700, 
+              fontSize: 20, 
+              letterSpacing: 1, 
+              color: '#e8eaed', 
+              marginLeft: 20,
+            }}>
+              BBYACHTS Admin
+            </span>
+          )}
+        </div>
+
+        <nav style={{ width: '100%', marginTop: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <SidebarLink to="/admin/dashboard/users" icon={<FaUserFriends />} open={menuOpen} label="Utilisateurs" />
+          <SidebarLink to="/admin/dashboard/bateaux" icon={<FaShip />} open={menuOpen} label="Bateaux" />
+          <SidebarLink to="/admin/dashboard/bateauxoccasion" icon={<FaClipboardList />} open={menuOpen} label="Bateaux d'occasion" />
+          <SidebarLink to="/admin/dashboard/calendrier" icon={<FaCalendarAlt />} open={menuOpen} label="Calendrier" />
+          <SidebarLink to="/admin/dashboard/reservations" icon={<FaClipboardList />} open={menuOpen} label="Réservations" />
+          <SidebarLink to="/admin/dashboard/villes" icon={<FaCity />} open={menuOpen} label="Villes" />
+          
+          {/* Dropdown Paramètres */}
+          <div style={{ position: 'relative', width: '100%' }}>
+            <div
+              onClick={() => setSettingsDropdown(v => !v)}
+              style={{
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 12, 
+                cursor: 'pointer',
+                background: '#1a1d23',
+                color: '#e8eaed',
+                padding: menuOpen ? '12px 16px' : '12px 0',
+                borderRadius: 8,
+                fontWeight: 500,
+                fontSize: menuOpen ? 14 : 20,
+                margin: '0 12px',
+                transition: 'all 0.2s ease',
+                border: '1px solid #374151',
+                justifyContent: menuOpen ? 'flex-start' : 'center',
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = '#374151';
+                e.target.style.borderColor = '#4b5563';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = '#1a1d23';
+                e.target.style.borderColor = '#374151';
+              }}
+            >
+              <span style={{ fontSize: 16, color: '#3b82f6' }}><FaCog /></span>
+              {menuOpen && <span>Paramètres</span>}
+              {menuOpen && (settingsDropdown ? <FaChevronUp style={{ marginLeft: 'auto', color: '#9ca3af' }} /> : <FaChevronDown style={{ marginLeft: 'auto', color: '#9ca3af' }} />)}
+            </div>
+            
+            {menuOpen && settingsDropdown && (
+              <div style={{
+                position: 'absolute', 
+                left: 0, 
+                top: '100%', 
+                background: '#2a2d35', 
+                boxShadow: '0 8px 24px rgba(0,0,0,0.4)', 
+                borderRadius: 8, 
+                minWidth: 220, 
+                zIndex: 10, 
+                marginTop: 4,
+                padding: '8px 0',
+                border: '1px solid #374151',
+              }}>
+                {settingsLinks.map(link => (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    style={{
+                      display: 'block', 
+                      color: '#e8eaed', 
+                      padding: '10px 16px', 
+                      textDecoration: 'none', 
+                      fontWeight: 500, 
+                      fontSize: 14,
+                      transition: 'all 0.2s ease',
+                    }}
+                    onClick={() => setSettingsDropdown(false)}
+                    onMouseEnter={(e) => {
+                      e.target.style.background = '#374151';
+                      e.target.style.color = '#60a5fa';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.background = 'transparent';
+                      e.target.style.color = '#e8eaed';
+                    }}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         </nav>
-        <div style={{ marginTop: 'auto', padding: '0 18px 18px', width: '100%' }}>
+
+        <div style={{ marginTop: 'auto', padding: '0 16px 20px', width: '100%' }}>
           <button
-            className="btn btn-outline-danger"
             onClick={async () => {
               await signOut(auth);
               window.location.href = '/';
             }}
             style={{
               width: '100%',
-              padding: '10px 0',
-              borderRadius: 10,
-              background: 'none',
-              border: '2px solid #ff4757',
-              color: '#ff4757',
+              padding: '12px 16px',
+              borderRadius: 8,
+              background: '#dc2626',
+              border: '1px solid #ef4444',
+              color: '#fff',
               fontWeight: 600,
-              fontSize: 16,
+              fontSize: 14,
               cursor: 'pointer',
-              transition: 'all 0.2s',
+              transition: 'all 0.2s ease',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: 8,
-              boxShadow: '0 1px 4px rgba(30,60,60,0.06)',
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.background = '#b91c1c';
+              e.target.style.transform = 'translateY(-1px)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = '#dc2626';
+              e.target.style.transform = 'translateY(0)';
             }}
           >
             <FaSignOutAlt />
@@ -95,18 +203,71 @@ export default function DashboardAdmin() {
           </button>
         </div>
       </aside>
-      {/* Contenu principal */}
-      <main
+
+      {/* Main content */}
+      <div
         style={{
-          marginLeft: menuOpen ? 220 : 60,
+          marginLeft: menuOpen ? 260 : 70,
           width: '100%',
-          padding: 32,
-          transition: 'margin-left 0.2s',
+          transition: 'margin-left 0.25s ease',
+          background: '#1a1d23',
         }}
       >
-        <Outlet />
-      </main>
-      {/* Responsive : menu burger en haut sur mobile */}
+        {/* Header */}
+        <header style={{
+          width: '100%',
+          background: '#2a2d35',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+          padding: '20px 32px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          minHeight: 70,
+          border: '1px solid #374151',
+          borderTop: 'none',
+        }}>
+          <span style={{ 
+            fontWeight: 700, 
+            fontSize: 24, 
+            color: '#e8eaed', 
+            letterSpacing: 0.5,
+          }}>
+            Administration
+          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <div style={{
+              width: 40,
+              height: 40,
+              borderRadius: '50%',
+              background: '#3b82f6',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#fff',
+              fontWeight: 600,
+              fontSize: 16,
+            }}>
+              A
+            </div>
+          </div>
+        </header>
+
+        {/* Content */}
+        <main style={{
+          background: '#2a2d35',
+          borderRadius: 12,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+          padding: '24px',
+          minHeight: 'calc(100vh - 110px)',
+          margin: '20px',
+          border: '1px solid #374151',
+          color: '#e8eaed',
+        }}>
+          <Outlet />
+        </main>
+      </div>
+
+      {/* Responsive */}
       <style>{`
         @media (max-width: 900px) {
           aside {
@@ -117,18 +278,18 @@ export default function DashboardAdmin() {
             z-index: 2000 !important;
           }
           main {
-            margin-left: ${menuOpen ? '220px' : '60px'} !important;
-            padding: 16px !important;
+            margin-left: ${menuOpen ? '260px' : '70px'} !important;
+            margin: 10px !important;
           }
         }
         @media (max-width: 600px) {
           aside {
-            width: ${menuOpen ? '80vw' : '48px'} !important;
+            width: ${menuOpen ? '80vw' : '60px'} !important;
             min-width: 0 !important;
           }
           main {
-            margin-left: ${menuOpen ? '80vw' : '48px'} !important;
-            padding: 8px !important;
+            margin-left: ${menuOpen ? '80vw' : '60px'} !important;
+            margin: 5px !important;
           }
         }
       `}</style>
@@ -136,22 +297,42 @@ export default function DashboardAdmin() {
   );
 }
 
-function menuLinkStyle(open) {
-  return {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 12,
-    background: open ? '#e6f0fa' : 'transparent',
-    color: open ? '#1e90ff' : '#fff',
-    padding: open ? '14px 18px' : '14px 0',
-    borderRadius: 10,
-    textAlign: open ? 'left' : 'center',
-    fontWeight: 600,
-    fontSize: open ? 18 : 22,
-    textDecoration: 'none',
-    margin: '0 8px',
-    transition: 'all 0.2s',
-    boxShadow: open ? '0 1px 4px rgba(30,60,60,0.06)' : 'none',
-    justifyContent: open ? 'flex-start' : 'center',
-  };
+function SidebarLink({ to, icon, open, label }) {
+  return (
+    <Link
+      to={to}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        background: '#1a1d23',
+        color: '#e8eaed',
+        padding: open ? '12px 16px' : '12px 0',
+        borderRadius: 8,
+        textAlign: open ? 'left' : 'center',
+        fontWeight: 500,
+        fontSize: open ? 14 : 20,
+        textDecoration: 'none',
+        margin: '0 12px',
+        transition: 'all 0.2s ease',
+        border: '1px solid #374151',
+        justifyContent: open ? 'flex-start' : 'center',
+      }}
+      onMouseEnter={(e) => {
+        e.target.style.background = '#374151';
+        e.target.style.borderColor = '#4b5563';
+        e.target.style.color = '#60a5fa';
+        e.target.style.transform = 'translateX(2px)';
+      }}
+      onMouseLeave={(e) => {
+        e.target.style.background = '#1a1d23';
+        e.target.style.borderColor = '#374151';
+        e.target.style.color = '#e8eaed';
+        e.target.style.transform = 'translateX(0)';
+      }}
+    >
+      <span style={{ fontSize: 16, color: '#3b82f6' }}>{icon}</span>
+      {open && <span>{label}</span>}
+    </Link>
+  );
 }
