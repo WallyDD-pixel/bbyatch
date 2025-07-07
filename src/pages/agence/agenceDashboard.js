@@ -120,8 +120,9 @@ export default function AgenceDashboard() {
     <div style={{ 
       display: 'flex', 
       minHeight: '100vh', 
-      background: '#0f1419',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+      background: '#0f1419', // fond sombre
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      color: '#e8eaed' // texte clair
     }}>
       {/* Overlay pour mobile */}
       {isMobile && menuOpen && (
@@ -144,7 +145,7 @@ export default function AgenceDashboard() {
       <aside
         style={{
           width: menuOpen ? (isMobile ? '280px' : '260px') : '70px',
-          background: '#1a1d23',
+          background: '#181c24', // sidebar sombre
           color: '#e8eaed',
           transition: 'all 0.3s ease',
           minHeight: '100vh',
@@ -155,16 +156,17 @@ export default function AgenceDashboard() {
           boxShadow: '4px 0 20px rgba(0,0,0,0.5)',
           display: 'flex',
           flexDirection: 'column',
-          borderRight: '1px solid #2a2d35'
+          borderRight: '1px solid #232a36'
         }}
       >
         {/* Header */}
         <div style={{
           padding: '24px 20px',
-          borderBottom: '1px solid #2a2d35',
+          borderBottom: '1px solid #232a36',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between'
+          justifyContent: 'space-between',
+          background: '#181c24'
         }}>
           {menuOpen && (
             <div>
@@ -189,7 +191,7 @@ export default function AgenceDashboard() {
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             style={{
-              background: '#2a2d35',
+              background: '#232a36',
               border: '1px solid #374151',
               color: '#e8eaed',
               fontSize: '16px',
@@ -199,11 +201,11 @@ export default function AgenceDashboard() {
               transition: 'all 0.2s'
             }}
             onMouseEnter={(e) => {
-              e.target.style.background = '#374151';
+              e.target.style.background = '#232a36';
               e.target.style.borderColor = '#4b5563';
             }}
             onMouseLeave={(e) => {
-              e.target.style.background = '#2a2d35';
+              e.target.style.background = '#232a36';
               e.target.style.borderColor = '#374151';
             }}
           >
@@ -217,7 +219,8 @@ export default function AgenceDashboard() {
           padding: '20px 0',
           display: 'flex',
           flexDirection: 'column',
-          gap: '6px'
+          gap: '6px',
+          background: '#181c24'
         }}>
           <SidebarLink 
             to="/agence/dashboard" 
@@ -258,7 +261,7 @@ export default function AgenceDashboard() {
         </nav>
 
         {/* Logout Button */}
-        <div style={{ padding: '20px' }}>
+        <div style={{ padding: '20px', background: '#181c24' }}>
           <button
             onClick={async () => {
               await auth.signOut();
@@ -268,7 +271,7 @@ export default function AgenceDashboard() {
               width: '100%',
               padding: menuOpen ? '12px 16px' : '12px 8px',
               borderRadius: '8px',
-              background: '#dc2626',
+              background: '#e74c3c',
               border: 'none',
               color: '#fff',
               fontWeight: 600,
@@ -278,14 +281,15 @@ export default function AgenceDashboard() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: menuOpen ? 'flex-start' : 'center',
-              gap: '10px'
+              gap: '10px',
+              boxShadow: '0 2px 8px #e74c3c33'
             }}
             onMouseEnter={(e) => {
-              e.target.style.background = '#b91c1c';
+              e.target.style.background = '#c0392b';
               e.target.style.transform = 'translateY(-1px)';
             }}
             onMouseLeave={(e) => {
-              e.target.style.background = '#dc2626';
+              e.target.style.background = '#e74c3c';
               e.target.style.transform = 'translateY(0)';
             }}
           >
@@ -309,13 +313,13 @@ export default function AgenceDashboard() {
       >
         {/* Header */}
         <header style={{
-          background: '#1a1d23',
+          background: '#181c24',
           boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
           padding: isMobile ? '16px 20px' : '20px 32px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          borderBottom: '1px solid #2a2d35',
+          borderBottom: '1px solid #232a36',
           position: 'sticky',
           top: 0,
           zIndex: 100
@@ -325,7 +329,7 @@ export default function AgenceDashboard() {
               <button
                 onClick={() => setMenuOpen(true)}
                 style={{
-                  background: '#2a2d35',
+                  background: '#232a36',
                   border: '1px solid #374151',
                   color: '#e8eaed',
                   padding: '10px',
@@ -358,13 +362,14 @@ export default function AgenceDashboard() {
           }}>
             <div style={{
               padding: '6px 14px',
-              background: '#3b82f6',
+              background: '#1e90ff',
               borderRadius: '16px',
               color: '#fff',
               fontSize: '12px',
               fontWeight: 600,
               textTransform: 'uppercase',
-              letterSpacing: '0.5px'
+              letterSpacing: '0.5px',
+              boxShadow: '0 2px 8px #1e90ff33'
             }}>
               Pro
             </div>
@@ -378,11 +383,11 @@ export default function AgenceDashboard() {
           background: '#0f1419'
         }}>
           <div style={{
-            background: '#1a1d23',
+            background: '#181c24',
             borderRadius: '12px',
             padding: isMobile ? '20px' : '32px',
             minHeight: '600px',
-            border: '1px solid #2a2d35',
+            border: '1px solid #232a36',
             boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
           }}>
             <Routes>

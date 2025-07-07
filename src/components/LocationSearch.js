@@ -3,7 +3,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { db } from "../firebase";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { MapPin, CalendarDays, Filter } from "lucide-react";
+import { MapPin, CalendarDays, Filter, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import "./LocationSearch.css";
 import fr from "date-fns/locale/fr"; // Import de la locale française
@@ -320,7 +320,7 @@ export default function LocationSearch() {
       </div>
 
       <button type="submit" className="search-btn-icon" title="Rechercher">
-        <Filter size={20} />
+        <Search size={20} />
       </button>
     </form>
   );

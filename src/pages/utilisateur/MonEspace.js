@@ -6,6 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import logo from '../../logo.svg';
 import { FaClipboardUser, FaChevronDown, FaClipboardList, FaIdCard, FaUser, FaCircleUser, FaCircleQuestion, FaRightFromBracket } from 'react-icons/fa6';
 import Modal from 'react-bootstrap/Modal';
+import NavBar from '../../components/NavBar';
 
 export default function MonEspace() {
   const [user, setUser] = useState(null);
@@ -118,54 +119,46 @@ export default function MonEspace() {
 
   return (
     <>
-      <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm" style={{ width: '100vw', left: 0, top: 0, position: 'fixed', zIndex: 1000 }}>
-        <div className="container-fluid">
-          <img src={logo} alt="BBYATCH logo" style={{ height: 40 }} className="me-2" />
-          <div className="ms-auto d-flex align-items-center" style={{ marginRight: 50 }}>
-            {infos.prenom && (
-              <span style={{ fontWeight: 700, color: '#000', fontSize: 18, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }} onClick={() => setShowProfileMenu(v => !v)}>
-                <FaClipboardUser style={{ color: '#000', fontSize: 22 }} /> {infos.prenom}
-                <FaChevronDown style={{ color: '#000', fontSize: 16 }} />
-                {showProfileMenu && (
-                  <div ref={profileMenuRef} style={{ position: 'absolute', top: 48, right: 50, background: '#fff', borderRadius: 12, boxShadow: '0 4px 24px rgba(0,0,0,0.13)', minWidth: 240, zIndex: 1000, padding: 0 }}>
-                    <div style={{ padding: '18px 18px 8px 18px', borderBottom: '1px solid #eee', fontWeight: 700, color: '#1e90ff', fontSize: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <FaCircleUser style={{ fontSize: 22 }} /> {infos.prenom}
-                    </div>
-                    <ul className="list-unstyled mb-0" style={{ padding: 0, margin: 0 }}>
-                      <li style={menuItemStyle} onClick={() => { setShowProfileMenu(false); setTab('compte'); }}><FaUser style={iconStyle} /> Mes informations</li>
-                      <li style={menuItemStyle} onClick={() => { setShowProfileMenu(false); setTab('reservations'); }}><FaClipboardList style={iconStyle} /> Mes réservations</li>
-                      <li style={{ ...menuItemStyle, borderTop: '1px solid #eee', marginTop: 6 }} onClick={() => { setShowProfileMenu(false); }}><FaCircleQuestion style={iconStyle} /> Aide</li>
-                      <li style={{ ...menuItemStyle, color: '#e74c3c', fontWeight: 700 }} onClick={async () => { setShowProfileMenu(false); await auth.signOut(); window.location.href = '/'; }}><FaRightFromBracket style={iconStyle} /> Se déconnecter</li>
-                    </ul>
-                  </div>
-                )}
-              </span>
-            )}
+      <NavBar />
+      <div className="container py-5" style={{ maxWidth: 1100, background:'#fff', minHeight:'100vh' }}>
+        {/* Message de bienvenue et résumé */}
+        <div className="mb-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+          <div>
+            <h2 className="titre-playfair mb-1" style={{color:'#222', fontWeight:800, fontSize:32}}>Bienvenue, {infos.prenom} !</h2>
+            <div style={{color:'#555', fontSize:18}}>Voici votre tableau de bord utilisateur.</div>
+          </div>
+          <div className="d-flex gap-3 flex-wrap">
+            <div style={{background:'#f8f9fa', borderRadius:16, padding:'18px 32px', minWidth:180, color:'#222', boxShadow:'0 2px 12px #0001', border:'1.5px solid #e5e7eb', display:'flex', flexDirection:'column', alignItems:'center'}}>
+              <FaClipboardList style={{fontSize:32, color:'#1e90ff', marginBottom:8}} />
+              <div style={{fontWeight:700, fontSize:28}}>{reservations.length}</div>
+              <div style={{fontSize:15, color:'#888'}}>Réservations</div>
+            </div>
+            <div style={{background:'#f8f9fa', borderRadius:16, padding:'18px 32px', minWidth:180, color:'#222', boxShadow:'0 2px 12px #0001', border:'1.5px solid #e5e7eb', display:'flex', flexDirection:'column', alignItems:'center'}}>
+              <FaUser style={{fontSize:32, color:'#1e90ff', marginBottom:8}} />
+              <div style={{fontWeight:700, fontSize:28}}>{infos.email ? 'Actif' : 'Incomplet'}</div>
+              <div style={{fontSize:15, color:'#888'}}>Statut du compte</div>
+            </div>
           </div>
         </div>
-      </nav>
-      <div style={{ height: 70 }} />
-      <div className="container py-5" style={{ maxWidth: 800 }}>
-        <h2 className="titre-playfair mb-4">Mon espace</h2>
-        <ul className="nav nav-tabs mb-4">
-          
+        {/* Navigation dashboard */}
+        <ul className="nav nav-tabs mb-4" style={{borderBottom:'1.5px solid #e5e7eb', background:'#fff'}}>
           <li className="nav-item">
-            <button className={`nav-link${tab==='reservations'?' active':''}`} onClick={()=>setTab('reservations')}>Mes réservations</button>
+            <button className={`nav-link${tab==='reservations'?' active':''}`} style={{background:'none', color:tab==='reservations'?'#1e90ff':'#555', border:'none', borderBottom:tab==='reservations'?'2.5px solid #1e90ff':'none', fontWeight:700, fontSize:17, borderRadius:0}} onClick={()=>setTab('reservations')}>Mes réservations</button>
           </li>
           <li className="nav-item">
-            <button className={`nav-link${tab==='compte'?' active':''}`} onClick={()=>setTab('compte')}>Compte</button>
+            <button className={`nav-link${tab==='compte'?' active':''}`} style={{background:'none', color:tab==='compte'?'#1e90ff':'#555', border:'none', borderBottom:tab==='compte'?'2.5px solid #1e90ff':'none', fontWeight:700, fontSize:17, borderRadius:0}} onClick={()=>setTab('compte')}>Mon compte</button>
           </li>
         </ul>
-        
+        {/* Section réservations avec aperçu rapide */}
         {tab==='reservations' && (
-          <div className="bg-white p-4 rounded shadow-sm">
-            <h5 className="mb-3">Historique de mes réservations</h5>
+          <div className="p-4 rounded shadow-sm" style={{background:'#f8f9fa', boxShadow:'0 4px 24px #0001', border:'1.5px solid #e5e7eb'}}>
+            <h4 className="mb-3" style={{color:'#222', fontWeight:700}}>Historique de mes réservations</h4>
             {reservations.length === 0 ? (
-              <div className="text-muted">Aucune réservation trouvée.</div>
+              <div className="text-muted" style={{color:'#aaa'}}>Aucune réservation trouvée.</div>
             ) : (
               <div className="table-responsive">
-                <table className="table table-bordered align-middle text-center" style={{ boxShadow: '0 4px 24px #1e90ff22', borderRadius: 16, overflow: 'hidden', background: '#fafdff' }}>
-                  <thead className="table-light" style={{ background: 'linear-gradient(90deg, #e6f0fa 60%, #fff 100%)', fontWeight: 700, fontSize: 17, color: '#1e90ff', letterSpacing: 1 }}>
+                <table className="table table-bordered align-middle text-center" style={{ boxShadow: '0 4px 24px #1e90ff11', borderRadius: 16, overflow: 'hidden', background: '#fff', color:'#222', border:'none' }}>
+                  <thead className="table-light" style={{ background: 'linear-gradient(90deg, #f8f9fa 60%, #fff 100%)', fontWeight: 700, fontSize: 17, color: '#1e90ff', letterSpacing: 1, border:'none' }}>
                     <tr>
                       <th style={{ border: 'none', padding: '16px 8px' }}>Bateau</th>
                       <th style={{ border: 'none', padding: '16px 8px' }}>Date début</th>
@@ -177,12 +170,12 @@ export default function MonEspace() {
                     </tr>
                   </thead>
                   <tbody>
-                    {reservations.map(r => (
-                      <tr key={r.id} style={{ background: '#fff', borderBottom: '1.5px solid #e6f0fa', transition: 'background 0.2s' }}>
+                    {reservations.slice(0,5).map(r => (
+                      <tr key={r.id} style={{ background: '#fff', borderBottom: '1.5px solid #e5e7eb', transition: 'background 0.2s' }}>
                         <td style={{ fontWeight: 600, color: '#1e90ff', fontSize: 16 }}>{r.bateauNom || bateauxMap[r.bateauId] || <span className="text-muted">-</span>}</td>
                         <td style={{ fontWeight: 500, color: '#222', fontSize: 15 }}>{r.dateDebut || <span className="text-muted">-</span>}</td>
                         <td style={{ fontWeight: 500, color: '#222', fontSize: 15 }}>{r.dateFin || <span className="text-muted">-</span>}</td>
-                        <td style={{ fontWeight: 600, color: '#0a2342', fontSize: 15 }}>{r.montant ? `${r.montant} ${r.devise ? r.devise.toUpperCase() : ''}` : <span className="text-muted">-</span>}</td>
+                        <td style={{ fontWeight: 600, color: '#1bbf4c', fontSize: 15 }}>{r.montant ? `${r.montant} ${r.devise ? r.devise.toUpperCase() : ''}` : <span className="text-muted">-</span>}</td>
                         <td>
                           {r.status || r.statut ? (
                             <span className={`badge bg-${(r.status||r.statut)==='paid'||(r.status||r.statut)==='Validée'?'success':(r.status||r.statut)==='pending'?'warning':'secondary'}`} style={{ fontSize: 15, padding: '8px 18px', borderRadius: 12, fontWeight: 700, letterSpacing: 1 }}>{(r.status||r.statut)==='paid' ? 'Payé' : (r.status||r.statut)==='pending' ? 'En attente' : (r.status||r.statut)==='Validée' ? 'Validée' : r.status||r.statut}</span>
@@ -204,90 +197,94 @@ export default function MonEspace() {
                     ))}
                   </tbody>
                 </table>
+                {reservations.length > 5 && (
+                  <div className="text-end mt-2">
+                    <button className="btn btn-link" style={{color:'#1e90ff', fontWeight:700}} onClick={()=>window.scrollTo({top:document.body.scrollHeight, behavior:'smooth'})}>Voir toutes les réservations</button>
+                  </div>
+                )}
               </div>
             )}
           </div>
         )}
+        {/* Section compte (fond clair) */}
         {tab==='compte' && (
-          <div className="bg-white p-4 rounded shadow-sm">
+          <div className="p-4 rounded shadow-sm" style={{background:'#f8f9fa', boxShadow:'0 4px 24px #0001', border:'1.5px solid #e5e7eb'}}>
             <div className="d-flex flex-column flex-md-row align-items-start w-100">
               <div style={{minWidth:220, maxWidth:320}} className="w-100 mb-4 mb-md-0 me-md-4">
-                <h2 style={{fontWeight:700, fontSize: '1.6rem'}}>Compte</h2>
-                <div style={{fontWeight:600, fontSize:16, marginBottom:24, textAlign:'left'}}>UN SEUL ENDROIT POUR GÉRER VOTRE COMPTE</div>
-                <ul className="nav nav-tabs flex-md-column mb-4 w-100" style={{borderBottom:'none'}}>
+                <h2 style={{fontWeight:700, fontSize: '1.6rem', color:'#222'}}>Compte</h2>
+                <div style={{fontWeight:600, fontSize:16, marginBottom:24, textAlign:'left', color:'#888'}}>Gérez vos informations personnelles, email, mot de passe et adresse.</div>
+                <ul className="nav nav-tabs flex-md-column mb-4 w-100" style={{borderBottom:'none', background:'#f8f9fa'}}>
                   <li className="nav-item">
-                    <button className={`nav-link${compteTab==='infos'?' active':''}`} style={{border:'none', borderBottom:compteTab==='infos'?'2px solid #1e90ff':'none', color:'#222', background:'none', fontWeight:600, width:'100%', textAlign:'left'}} onClick={()=>setCompteTab('infos')}>Informations supplémentaires</button>
+                    <button className={`nav-link${compteTab==='infos'?' active':''}`} style={{border:'none', borderLeft:compteTab==='infos'?'4px solid #1e90ff':'4px solid transparent', color:compteTab==='infos'?'#1e90ff':'#555', background:'none', fontWeight:600, width:'100%', textAlign:'left', borderRadius:8, marginBottom:6, padding:'10px 16px'}} onClick={()=>setCompteTab('infos')}>Informations personnelles</button>
                   </li>
                   <li className="nav-item">
-                    <button className={`nav-link${compteTab==='email'?' active':''}`} style={{border:'none', borderBottom:compteTab==='email'?'2px solid #1e90ff':'none', color:'#222', background:'none', fontWeight:600, width:'100%', textAlign:'left'}} onClick={()=>setCompteTab('email')}>Adresse email</button>
+                    <button className={`nav-link${compteTab==='email'?' active':''}`} style={{border:'none', borderLeft:compteTab==='email'?'4px solid #1e90ff':'4px solid transparent', color:compteTab==='email'?'#1e90ff':'#555', background:'none', fontWeight:600, width:'100%', textAlign:'left', borderRadius:8, marginBottom:6, padding:'10px 16px'}} onClick={()=>setCompteTab('email')}>Adresse email</button>
                   </li>
                   <li className="nav-item">
-                    <button className={`nav-link${compteTab==='password'?' active':''}`} style={{border:'none', borderBottom:compteTab==='password'?'2px solid #1e90ff':'none', color:'#222', background:'none', fontWeight:600, width:'100%', textAlign:'left'}} onClick={()=>setCompteTab('password')}>Modifiez votre mot de passe</button>
+                    <button className={`nav-link${compteTab==='password'?' active':''}`} style={{border:'none', borderLeft:compteTab==='password'?'4px solid #1e90ff':'4px solid transparent', color:compteTab==='password'?'#1e90ff':'#555', background:'none', fontWeight:600, width:'100%', textAlign:'left', borderRadius:8, marginBottom:6, padding:'10px 16px'}} onClick={()=>setCompteTab('password')}>Mot de passe</button>
                   </li>
                   <li className="nav-item">
-                    <button className={`nav-link${compteTab==='adresse'?' active':''}`} style={{border:'none', borderBottom:compteTab==='adresse'?'2px solid #1e90ff':'none', color:'#222', background:'none', fontWeight:600, width:'100%', textAlign:'left'}} onClick={()=>setCompteTab('adresse')}>Adresse (optionnel)</button>
+                    <button className={`nav-link${compteTab==='adresse'?' active':''}`} style={{border:'none', borderLeft:compteTab==='adresse'?'4px solid #1e90ff':'4px solid transparent', color:compteTab==='adresse'?'#1e90ff':'#555', background:'none', fontWeight:600, width:'100%', textAlign:'left', borderRadius:8, marginBottom:6, padding:'10px 16px'}} onClick={()=>setCompteTab('adresse')}>Adresse (optionnel)</button>
                   </li>
                 </ul>
               </div>
               <div style={{flex:1, minWidth:0}} className="w-100">
                 {compteTab==='infos' && (
-                  <form style={{
-                    maxWidth:500,
-                    background:'#fff',
-                    borderRadius:18,
-                    boxShadow:'0 2px 16px #00000022',
-                    padding:32,
-                    border:'1.5px solid #222'
-                  }}>
-                    <h3 style={{textAlign:'center', color:'#111', fontWeight:800, marginBottom:8, letterSpacing:0.5}}>Informations supplémentaires</h3>
-                    <div className="row mb-4">
-                      <div className="col-6">
-                        <label className="form-label" style={{fontWeight:700, color:'#111'}}>Nom</label>
-                        <input type="text" className="form-control" value={formInfos.nom} onChange={e=>setFormInfos({...formInfos, nom:e.target.value})} style={{fontWeight:600, color:'#111', background:'#fff', border:'1.5px solid #222', borderRadius:10, boxShadow:'none'}} />
+                  <div style={{background:'#fff', borderRadius:18, boxShadow:'0 2px 16px #0001', padding:32, border:'1.5px solid #e5e7eb', color:'#222', marginBottom:24}}>
+                    <h4 style={{color:'#222', fontWeight:700, marginBottom:8}}>Informations personnelles</h4>
+                    <div style={{color:'#888', marginBottom:18}}>Modifiez votre nom, prénom et numéro de téléphone.</div>
+                    <form>
+                      <div className="row mb-4">
+                        <div className="col-6">
+                          <label className="form-label" style={{fontWeight:700, color:'#222'}}>Nom</label>
+                          <input type="text" className="form-control" value={formInfos.nom} onChange={e=>setFormInfos({...formInfos, nom:e.target.value})} style={{fontWeight:600, color:'#222', background:'#f8f9fa', border:'1.5px solid #e5e7eb', borderRadius:10, boxShadow:'none'}} />
+                        </div>
+                        <div className="col-6">
+                          <label className="form-label" style={{fontWeight:700, color:'#222'}}>Prénom</label>
+                          <input type="text" className="form-control" value={formInfos.prenom} onChange={e=>setFormInfos({...formInfos, prenom:e.target.value})} style={{fontWeight:600, color:'#222', background:'#f8f9fa', border:'1.5px solid #e5e7eb', borderRadius:10, boxShadow:'none'}} />
+                        </div>
                       </div>
-                      <div className="col-6">
-                        <label className="form-label" style={{fontWeight:700, color:'#111'}}>Prénom</label>
-                        <input type="text" className="form-control" value={formInfos.prenom} onChange={e=>setFormInfos({...formInfos, prenom:e.target.value})} style={{fontWeight:600, color:'#111', background:'#fff', border:'1.5px solid #222', borderRadius:10, boxShadow:'none'}} />
+                      <div className="row mb-4">
+                        <div className="col-4">
+                          <label className="form-label" style={{fontWeight:700, color:'#222'}}>Code du pays</label>
+                          <select className="form-control" value={formCountryCode} onChange={e=>setFormCountryCode(e.target.value)} style={{fontWeight:600, color:'#222', background:'#f8f9fa', border:'1.5px solid #e5e7eb', borderRadius:10}}>
+                            <option value="+33">+33</option>
+                            <option value="+32">+32</option>
+                            <option value="+41">+41</option>
+                            <option value="+1">+1</option>
+                          </select>
+                        </div>
+                        <div className="col-8">
+                          <label className="form-label" style={{fontWeight:700, color:'#222'}}>Numéro de téléphone</label>
+                          <input type="tel" className="form-control" value={formPhone} onChange={e=>setFormPhone(e.target.value)} style={{fontWeight:600, color:'#222', background:'#f8f9fa', border:'1.5px solid #e5e7eb', borderRadius:10}} />
+                        </div>
                       </div>
-                    </div>
-                    <div className="row mb-4">
-                      <div className="col-4">
-                        <label className="form-label" style={{fontWeight:700, color:'#111'}}>Code du pays</label>
-                        <select className="form-control" value={formCountryCode} onChange={e=>setFormCountryCode(e.target.value)} style={{fontWeight:600, color:'#111', background:'#fff', border:'1.5px solid #222', borderRadius:10}}>
-                          <option value="+33">+33</option>
-                          <option value="+32">+32</option>
-                          <option value="+41">+41</option>
-                          <option value="+1">+1</option>
-                        </select>
+                      <button className="btn" style={{background:'#1e90ff', color:'#fff', fontWeight:700, width:250, borderRadius:12, fontSize:18, boxShadow:'0 2px 8px #1e90ff22'}} type="button" onClick={handleSave}>Enregistrer</button>
+                      <div className="mt-4">
+                        <button type="button" className="btn btn-link text-danger" style={{fontWeight:600, textDecoration:'none'}}> <i className="fa fa-trash" /> Supprimer le compte</button>
                       </div>
-                      <div className="col-8">
-                        <label className="form-label" style={{fontWeight:700, color:'#111'}}>Numéro de téléphone</label>
-                        <input type="tel" className="form-control" value={formPhone} onChange={e=>setFormPhone(e.target.value)} style={{fontWeight:600, color:'#111', background:'#fff', border:'1.5px solid #222', borderRadius:10}} />
-                      </div>
-                    </div>
-                    <button className="btn" style={{background:'#111', color:'#fff', fontWeight:700, width:250, borderRadius:12, fontSize:18, boxShadow:'0 2px 8px #00000022'}} type="button" onClick={handleSave}>Enregistrer</button>
-                    <div className="mt-4">
-                      <button type="button" className="btn btn-link text-danger" style={{fontWeight:600, textDecoration:'none'}}> <i className="fa fa-trash" /> Supprimer le compte</button>
-                    </div>
-                  </form>
+                    </form>
+                  </div>
                 )}
                 {compteTab==='email' && (
-                  <div style={{maxWidth:500}}>
-                    <label className="form-label" style={{fontWeight:600}}>Adresse email</label>
-                    <input type="email" className="form-control mb-3" value={infos.email} disabled readOnly style={{fontWeight:600, color:'#888', background:'none', border:'none', borderBottom:'2px solid #eee', borderRadius:0}} />
-                    <div className="text-muted">Pour modifier votre email, contactez le support.</div>
+                  <div style={{background:'#fff', borderRadius:18, boxShadow:'0 2px 16px #0001', padding:32, border:'1.5px solid #e5e7eb', color:'#222', marginBottom:24}}>
+                    <h4 style={{color:'#222', fontWeight:700, marginBottom:8}}>Adresse email</h4>
+                    <div style={{color:'#888', marginBottom:18}}>Votre adresse email actuelle est affichée ci-dessous. Pour la modifier, contactez le support.</div>
+                    <input type="email" className="form-control mb-3" value={infos.email} disabled readOnly style={{fontWeight:600, color:'#888', background:'none', border:'none', borderBottom:'2px solid #e5e7eb', borderRadius:0}} />
                   </div>
                 )}
                 {compteTab==='password' && (
-                  <div style={{maxWidth:500}}>
-                    <label className="form-label" style={{fontWeight:600}}>Mot de passe actuel</label>
-                    <input type="password" className="form-control mb-3" value={currentPassword} onChange={e=>setCurrentPassword(e.target.value)} style={{fontWeight:600, color:'#111', background:'#fff', border:'1.5px solid #222', borderRadius:10}} />
-                    <label className="form-label" style={{fontWeight:600}}>Nouveau mot de passe</label>
-                    <input type="password" className="form-control mb-3" value={newPassword} onChange={e=>setNewPassword(e.target.value)} style={{fontWeight:600, color:'#111', background:'#fff', border:'1.5px solid #222', borderRadius:10}} />
-                    <label className="form-label" style={{fontWeight:600}}>Confirmer le mot de passe</label>
-                    <input type="password" className="form-control mb-3" value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} style={{fontWeight:600, color:'#111', background:'#fff', border:'1.5px solid #222', borderRadius:10}} />
+                  <div style={{background:'#fff', borderRadius:18, boxShadow:'0 2px 16px #0001', padding:32, border:'1.5px solid #e5e7eb', color:'#222', marginBottom:24}}>
+                    <h4 style={{color:'#222', fontWeight:700, marginBottom:8}}>Changer le mot de passe</h4>
+                    <div style={{color:'#888', marginBottom:18}}>Pour plus de sécurité, choisissez un mot de passe d’au moins 6 caractères.</div>
+                    <label className="form-label" style={{fontWeight:600, color:'#222'}}>Mot de passe actuel</label>
+                    <input type="password" className="form-control mb-3" value={currentPassword} onChange={e=>setCurrentPassword(e.target.value)} style={{fontWeight:600, color:'#222', background:'#f8f9fa', border:'1.5px solid #e5e7eb', borderRadius:10}} />
+                    <label className="form-label" style={{fontWeight:600, color:'#222'}}>Nouveau mot de passe</label>
+                    <input type="password" className="form-control mb-3" value={newPassword} onChange={e=>setNewPassword(e.target.value)} style={{fontWeight:600, color:'#222', background:'#f8f9fa', border:'1.5px solid #e5e7eb', borderRadius:10}} />
+                    <label className="form-label" style={{fontWeight:600, color:'#222'}}>Confirmer le mot de passe</label>
+                    <input type="password" className="form-control mb-3" value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} style={{fontWeight:600, color:'#222', background:'#f8f9fa', border:'1.5px solid #e5e7eb', borderRadius:10}} />
                     {passwordError && <div className="alert alert-danger py-2">{passwordError}</div>}
-                    <button className="btn btn-dark" onClick={() => {
+                    <button className="btn btn-primary" style={{background:'#1e90ff', border:'none', fontWeight:700}} onClick={() => {
                       setPasswordError('');
                       if (!currentPassword) {
                         setPasswordError('Veuillez saisir votre mot de passe actuel.');
@@ -301,16 +298,16 @@ export default function MonEspace() {
                         setPasswordError('Les mots de passe ne correspondent pas.');
                         return;
                       }
-                      // Ici, tu peux ajouter la logique de changement de mot de passe Firebase
                       setPasswordError('Changement de mot de passe non implémenté.');
                     }}>Modifier le mot de passe</button>
                   </div>
                 )}
                 {compteTab==='adresse' && (
-                  <div style={{maxWidth:500}}>
-                    <label className="form-label" style={{fontWeight:600}}>Adresse (optionnel)</label>
-                    <input type="text" className="form-control mb-3" placeholder="Votre adresse" style={{fontWeight:600, color:'#222', background:'none', border:'none', borderBottom:'2px solid #eee', borderRadius:0}} />
-                    <button className="btn btn-outline-dark">Enregistrer l'adresse</button>
+                  <div style={{background:'#fff', borderRadius:18, boxShadow:'0 2px 16px #0001', padding:32, border:'1.5px solid #e5e7eb', color:'#222', marginBottom:24}}>
+                    <h4 style={{color:'#222', fontWeight:700, marginBottom:8}}>Adresse (optionnel)</h4>
+                    <div style={{color:'#888', marginBottom:18}}>Vous pouvez renseigner une adresse postale si besoin.</div>
+                    <input type="text" className="form-control mb-3" placeholder="Votre adresse" style={{fontWeight:600, color:'#222', background:'none', border:'none', borderBottom:'2px solid #e5e7eb', borderRadius:0}} />
+                    <button className="btn btn-outline-primary" style={{color:'#1e90ff', borderColor:'#1e90ff'}}>Enregistrer l'adresse</button>
                   </div>
                 )}
               </div>
