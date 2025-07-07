@@ -103,16 +103,8 @@ export default function Confirmation() {
       protectionPrix: 0,
       montantTotal: total
     };
-    if (!user) {
-      await addDoc(collection(db, "userNoAuth"), {
-        nom,
-        prenom,
-        email,
-        ...infosReservation,
-        createdAt: new Date()
-      });
-    }
-    fetch("http://localhost:4242/create-checkout-session", {
+    
+    fetch("https://bbyatch-2.onrender.com/create-checkout-session", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
