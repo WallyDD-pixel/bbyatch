@@ -5,6 +5,7 @@
 /.pnp
 .pnp.js
 backend/.env
+
 # testing
 /coverage
 
@@ -21,3 +22,7 @@ backend/.env
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Fichiers exclus du versioning
+backend/server.js
+src/pages/Confirmation.js
