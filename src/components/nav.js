@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
-import logo from "../../logo.svg";
+import logo from '../../build/logo192.png';
 import { useNavigate } from "react-router-dom";
-import { auth } from "../../firebase";
+import { auth } from '../../src/firebase';
 import { signOut, onAuthStateChanged } from "firebase/auth";
 import { FaUser, FaChevronDown, FaUserCircle, FaQuestionCircle, FaSignOutAlt, FaClipboardList } from 'react-icons/fa';
 

@@ -128,6 +128,12 @@ export default function Confirmation() {
     navigate(-1);
   }
 
+  // Modal affiché si l'utilisateur n'est pas connecté
+  const [showModal, setShowModal] = useState(false);
+  useEffect(() => {
+    setShowModal(!user);
+  }, [user]);
+
   return (
     <>
       <NavBar />
@@ -137,6 +143,87 @@ export default function Confirmation() {
         backgroundColor: '#f8f9fa',
         fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
       }}>
+        {showModal && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            background: 'rgba(0,0,0,0.4)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999
+          }}>
+            <div style={{
+              background: '#fff',
+              borderRadius: 12,
+              padding: 40,
+              boxShadow: '0 2px 20px rgba(0,0,0,0.15)',
+              minWidth: 350,
+              textAlign: 'center'
+            }}>
+              <h2 style={{ color: '#1976d2', fontWeight: 700, marginBottom: 20 }}>
+                Veuillez vous connecter
+              </h2>
+              <p style={{ color: '#495057', fontSize: 16, marginBottom: 30 }}>
+                Vous devez être connecté pour continuer la réservation et procéder au paiement.
+              </p>
+              <button
+                style={{
+                  background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
+                  color: '#fff',
+                  fontWeight: 600,
+                  fontSize: 16,
+                  borderRadius: 8,
+                  padding: '12px 32px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  marginBottom: 8
+                }}
+                onClick={() => {
+                  // Construction de l'URL avec tous les paramètres de réservation
+                  const params = new URLSearchParams({
+                    from: 'confirmation',
+                    dateDebut,
+                    heureDebut,
+                    dateFin,
+                    heureFin,
+                    prix,
+                    bateauId,
+                    bateauNom,
+                    bateauVille,
+                    services: servicesParam,
+                    totalServices: totalServices.toString(),
+                    totalGeneral: totalGeneral.toString()
+                  }).toString();
+                  navigate(`/connexion?${params}`);
+                }}
+              >
+                Se connecter
+              </button>
+              <div style={{ height: 8 }} />
+              <button
+                style={{
+                  background: '#fff',
+                  color: '#1976d2',
+                  fontWeight: 600,
+                  fontSize: 16,
+                  borderRadius: 8,
+                  padding: '12px 32px',
+                  border: '2px solid #1976d2',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+                onClick={() => navigate('/demande-particulier')}
+              >
+                Faire une demande en tant que particulier
+              </button>
+            </div>
+          </div>
+        )}
         <div className="container" style={{ maxWidth: 900 }}>
           {/* Header sobre et professionnel */}
           <div style={{ 

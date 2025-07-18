@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import NavBar from "../components/NavBar";
+import { useNavigate } from "react-router-dom";
 
 export default function Vente() {
   const [bateaux, setBateaux] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchBateaux() {
@@ -29,18 +31,23 @@ export default function Vente() {
           <div className="row" style={{gap: '32px 0'}}>
             {bateaux.map(bateau => (
               <div key={bateau.id} className="col-12 col-md-6 col-lg-4 mb-4 d-flex">
-                <div className="card w-100 h-100" style={{ 
-                  borderRadius: 18, 
-                  boxShadow: "0 6px 32px #0001", 
-                  overflow: "hidden", 
-                  background: '#fff',
-                  border: '1.5px solid #e5e7eb',
-                  color: '#222',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  transition: 'transform 0.18s',
-                  minHeight: 420
-                }}>
+                <div
+                  className="card w-100 h-100"
+                  style={{ 
+                    borderRadius: 18, 
+                    boxShadow: "0 6px 32px #0001", 
+                    overflow: "hidden", 
+                    background: '#fff',
+                    border: '1.5px solid #e5e7eb',
+                    color: '#222',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    transition: 'transform 0.18s',
+                    minHeight: 420,
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => navigate(`/bateau/${bateau.id}`)}
+                >
                   {bateau.photo && bateau.photo[0] && (
                     <img src={bateau.photo[0]} alt={bateau.nom} style={{ width: "100%", height: 220, objectFit: "cover", borderBottom: '1.5px solid #e5e7eb' }} />
                   )}

@@ -87,7 +87,8 @@ export default function DashboardAdmin() {
           <SidebarLink to="/admin/dashboard/calendrier" icon={<FaCalendarAlt />} open={menuOpen} label="Calendrier" />
           <SidebarLink to="/admin/dashboard/reservations" icon={<FaClipboardList />} open={menuOpen} label="Réservations" />
           <SidebarLink to="/admin/dashboard/villes" icon={<FaCity />} open={menuOpen} label="Villes" />
-          
+          {/* Onglet ajouté pour les demandes particuliers */}
+          <SidebarLink to="/admin/dashboard/demandes-particuliers" icon={<FaClipboardList />} open={menuOpen} label="Demandes particuliers" />
           {/* Dropdown Paramètres */}
           <div style={{ position: 'relative', width: '100%' }}>
             <div

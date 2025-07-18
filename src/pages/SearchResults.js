@@ -102,70 +102,37 @@ export default function SearchResults() {
     });
   };
 
-  // Fonction pour vérifier si un bateau est disponible aux dates demandées (sans heures)
+  // Fonction pour vérifier si un bateau est disponible aux dates demandées (ignore l'heure)
   const isBateauAvailable = (bateau, dateDebut, heureDebut, dateFin, heureFin) => {
-    console.log(`\n🔍 VÉRIFICATION bateau ${bateau.nom}:`);
-    
+    // On ignore heureDebut et heureFin
     if (!bateau.disponibilites || !Array.isArray(bateau.disponibilites)) {
-      console.log(`  ❌ Aucune disponibilité définie`);
       return false;
     }
-
     if (bateau.disponibilites.length === 0) {
-      console.log(`  ❌ Tableau des disponibilités vide`);
       return false;
     }
-
-    // Convertir les dates demandées en jours uniquement (sans heures)
+    // Convertir les dates demandées en jours uniquement (ignorer l'heure)
     const requestedStartDate = new Date(dateDebut);
-    requestedStartDate.setHours(0, 0, 0, 0); // Minuit du jour de début
-
+    requestedStartDate.setHours(0, 0, 0, 0);
     const requestedEndDate = new Date(dateFin);
-    requestedEndDate.setHours(23, 59, 59, 999); // Fin du jour de fin
-
-    console.log(`  📅 Jours demandés: ${requestedStartDate.toDateString()} à ${requestedEndDate.toDateString()}`);
-    console.log(`  🔎 ${bateau.disponibilites.length} disponibilité(s) à vérifier:`);
-
+    requestedEndDate.setHours(23, 59, 59, 999);
     // Vérifier si le bateau a des disponibilités qui couvrent les jours demandés
-    const isAvailable = bateau.disponibilites.some((dispo, index) => {
-      console.log(`\n    📋 Disponibilité ${index + 1}:`);
-      
-      if (!dispo.start || !dispo.end) {
-        console.log(`      ❌ Disponibilité incomplète`);
-        return false;
-      }
-
+    return bateau.disponibilites.some((dispo) => {
+      if (!dispo.start || !dispo.end) return false;
       try {
         const availableStart = new Date(dispo.start);
         const availableEnd = new Date(dispo.end);
-        
-        if (isNaN(availableStart.getTime()) || isNaN(availableEnd.getTime())) {
-          console.log(`      ❌ Dates invalides`);
-          return false;
-        }
-
+        if (isNaN(availableStart.getTime()) || isNaN(availableEnd.getTime())) return false;
         // Extraire seulement les jours des disponibilités
         const availableStartDay = new Date(availableStart.getFullYear(), availableStart.getMonth(), availableStart.getDate());
         const availableEndDay = new Date(availableEnd.getFullYear(), availableEnd.getMonth(), availableEnd.getDate());
-        availableEndDay.setHours(23, 59, 59, 999); // Fin du jour disponible
-
-        console.log(`      📅 Jours disponibles: ${availableStartDay.toDateString()} à ${availableEndDay.toDateString()}`);
-        
-        // NOUVELLE LOGIQUE : Vérifier si les jours demandés sont couverts par les jours disponibles
-        const canCoverPeriod = requestedStartDate >= availableStartDay && requestedEndDate <= availableEndDay;
-        
-        console.log(`      ✅ Peut couvrir la période? ${canCoverPeriod}`);
-        
-        return canCoverPeriod;
-        
-      } catch (error) {
-        console.log(`      ❌ Erreur: ${error.message}`);
+        availableEndDay.setHours(23, 59, 59, 999);
+        // Vérifier si les jours demandés sont couverts par les jours disponibles
+        return requestedStartDate >= availableStartDay && requestedEndDate <= availableEndDay;
+      } catch {
         return false;
       }
     });
-
-    console.log(`  🎯 RÉSULTAT pour ${bateau.nom}: ${isAvailable ? '✅ DISPONIBLE' : '❌ NON DISPONIBLE'}`);
-    return isAvailable;
   };
 
   // Fonction pour obtenir les créneaux horaires disponibles d'un bateau pour les dates sélectionnées
@@ -221,17 +188,11 @@ export default function SearchResults() {
     async function fetchResults() {
       if (!ville) return;
       setLoading(true);
-      
       const q = query(collection(db, "bateaux"), where("Ville", "==", ville));
       const snap = await getDocs(q);
       const allBateaux = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      
-      // Filtrer seulement les bateaux disponibles aux créneaux demandés
-      const availableBateaux = allBateaux.filter(bateau => 
-        isBateauAvailable(bateau, dateDebut, heureDebut, dateFin, heureFin)
-      );
-      
-      setResults(availableBateaux);
+      // Afficher tous les bateaux de la ville, sans filtrer par disponibilité
+      setResults(allBateaux);
       setLoading(false);
     }
     fetchResults();

@@ -28,6 +28,9 @@ import AdminCalendrier from './pages/admin/AdminCalendrier';
 import AgenceDashboard from './pages/agence/agenceDashboard';
 import EditerDisponibilitesBateau from './pages/agence/EditerDisponibilitesBateau';
 import EditerBateau from './pages/agence/EditerBateau';
+import DemandeParticulier from './pages/DemandeParticulier';
+import DemandesParticuliers from './pages/admin/DemandesParticuliers';
+import BateauOccasionDetail from './pages/BateauOccasionDetail';
 
 
 
@@ -38,7 +41,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/search-results" element={<SearchResults />} />
-          <Route path="/bateau/:id" element={<BateauDetails />} />
+          <Route path="/bateau/:id" element={<BateauOccasionDetail />} />
           <Route path="/confirmation" element={<Confirmation />} />
           <Route path="/infos-client" element={<InfosClient />} />
           <Route path="/connexion" element={<Connexion />} />
@@ -58,6 +61,7 @@ function App() {
             <Route path="settings/presentation" element={<AdminPresentationHome />} />
             <Route path="settings/services" element={<AdminServicesHome />} />
             <Route path="users" element={<AdminUsers />} />
+            <Route path="demandes-particuliers" element={<DemandesParticuliers />} />
           </Route>
           <Route path="/agence/dashboard/*" element={<AgenceDashboard />} />
           
@@ -66,6 +70,7 @@ function App() {
           <Route path="/vente" element={<Vente />} />
           <Route path="/agence/dashboard/bateaux/:id/disponibilites" element={<EditerDisponibilitesBateau />} />
           <Route path="/agence/dashboard/bateaux/:id/edit" element={<EditerBateau />} />
+          <Route path="/demande-particulier" element={<DemandeParticulier />} />
         </Routes>
       </div>
     </Router>

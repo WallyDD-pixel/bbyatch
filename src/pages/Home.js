@@ -16,7 +16,7 @@ export default function Home() {
     const [backgroundUrl, setBackgroundUrl] = useState(
         "https://static.vecteezy.com/ti/photos-gratuite/p2/5582136-fond-blanc-texture-motif-blanc-photo.jpg"
       );
-    const [villes, setVilles] = useState([]);
+    const [villes, setVilles] = useState(["Golf Juan"]);
     const [ville, setVille] = useState("");
     const [user, setUser] = useState(null);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -58,12 +58,8 @@ export default function Home() {
     }, []);
 
     useEffect(() => {
-      async function fetchVilles() {
-        const villesCol = collection(db, "villes");
-        const villesSnap = await getDocs(villesCol);
-        setVilles(villesSnap.docs.map(doc => doc.data().nom));
-      }
-      fetchVilles();
+      // La liste des villes est fixée à Golf Juan uniquement
+      setVilles(["Golf Juan"]);
     }, []);
 
     useEffect(() => {
@@ -153,136 +149,6 @@ export default function Home() {
       >
         <LocationSearch villes={villes} ville={ville} setVille={setVille} />
       </header>
-
-      {/* Section présentation responsive */}
-      <section className="py-5" style={{ background: '#fafbfc' }}>
-        <div className="container" style={{ maxWidth: 1100 }}>
-          <div style={{
-            background: '#ffffff',
-            borderRadius: isMobile ? 12 : 16,
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-            padding: isMobile ? '24px 16px' : isTablet ? '32px 24px' : '48px 40px',
-            border: '1px solid #e1e5e9',
-            position: 'relative',
-            marginBottom: isMobile ? 24 : 40,
-            margin: isMobile ? '0 10px' : '0 auto'
-          }}>
-            {/* Ligne décorative responsive */}
-            <div style={{
-              position: 'absolute',
-              top: 0,
-              left: isMobile ? 16 : isTablet ? 24 : 40,
-              right: isMobile ? 16 : isTablet ? 24 : 40,
-              height: isMobile ? 3 : 4,
-              background: 'linear-gradient(90deg, #2c3e50 0%, #34495e 100%)',
-              borderRadius: '0 0 2px 2px'
-            }}></div>
-            
-            <h2 className="text-center mb-4" style={{ 
-              fontWeight: 700, 
-              fontSize: isMobile ? 20 : isTablet ? 26 : 32, 
-              color: '#2c3e50',
-              letterSpacing: -0.5,
-              paddingTop: 8,
-              lineHeight: isMobile ? 1.3 : 1.2
-            }}>
-              {presentation.titre}
-            </h2>
-            
-            <p className="text-center mb-5" style={{ 
-              fontSize: isMobile ? 14 : isTablet ? 16 : 18, 
-              color: '#6c757d',
-              lineHeight: 1.6,
-              maxWidth: isMobile ? '100%' : 800,
-              margin: '0 auto 32px',
-              padding: isMobile ? '0 8px' : 0
-            }}>
-              {presentation.texte}
-            </p>
-
-            <h3 className="text-center mb-4" style={{ 
-              fontWeight: 600, 
-              fontSize: isMobile ? 18 : isTablet ? 20 : 24, 
-              color: '#2c3e50',
-              letterSpacing: -0.3,
-              lineHeight: isMobile ? 1.4 : 1.3
-            }}>
-              {presentation.sousTitre}
-            </h3>
-            
-            <p className="text-center mb-5" style={{ 
-              fontSize: isMobile ? 13 : isTablet ? 14 : 16, 
-              color: '#6c757d',
-              lineHeight: 1.5,
-              maxWidth: isMobile ? '100%' : 700,
-              margin: '0 auto 40px',
-              padding: isMobile ? '0 8px' : 0
-            }}>
-              {presentation.sousTexte}
-            </p>
-
-            {/* Piliers redesignés - Responsive */}
-            <div className={`row g-${isMobile ? '3' : '4'} justify-content-center`}>
-              {presentation.piliers && presentation.piliers.map((p, idx) => (
-                <div className={isMobile ? "col-6" : "col-12 col-md-6 col-lg-3"} key={idx}>
-                  <div style={{
-                    background: '#f8f9fa',
-                    borderRadius: isMobile ? 10 : 12,
-                    padding: isMobile ? '16px 12px' : isTablet ? '24px 16px' : '32px 24px',
-                    textAlign: 'center',
-                    border: '1px solid #e9ecef',
-                    transition: 'all 0.3s ease',
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    position: 'relative'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isMobile) {
-                      e.currentTarget.style.transform = 'translateY(-4px)';
-                      e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.12)';
-                      e.currentTarget.style.borderColor = '#6c757d';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isMobile) {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = 'none';
-                      e.currentTarget.style.borderColor = '#e9ecef';
-                    }
-                  }}>
-                    <div style={{ 
-                      fontSize: isMobile ? 24 : isTablet ? 32 : 40, 
-                      marginBottom: isMobile ? 8 : 12,
-                      opacity: 0.9
-                    }}>
-                      {p.icon}
-                    </div>
-                    <h5 style={{ 
-                      color: '#2c3e50',
-                      fontSize: isMobile ? 14 : isTablet ? 16 : 18,
-                      fontWeight: 700,
-                      marginBottom: isMobile ? 8 : 12,
-                      letterSpacing: 0.3
-                    }}>
-                      {p.titre}
-                    </h5>
-                    <p style={{ 
-                      color: '#6c757d',
-                      fontSize: isMobile ? 11 : isTablet ? 12 : 14,
-                      lineHeight: 1.5,
-                      margin: 0,
-                      flex: 1
-                    }}>
-                      {p.texte}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Section expérience responsive */}
       <section className="py-5" style={{ background: '#fafbfc' }}>

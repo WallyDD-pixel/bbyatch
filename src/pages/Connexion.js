@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { auth, db } from '../firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default function Connexion() {
@@ -11,6 +11,9 @@ export default function Connexion() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const fromConfirmation = queryParams.get('from') === 'confirmation';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,13 +28,18 @@ export default function Connexion() {
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       if (userDoc.exists()) {
         const data = userDoc.data();
-        console.log('Rôle utilisateur:', data.role);
-        if ((data.role || '').toLowerCase() === 'admin') {
+        if (data.role === 'Admin') {
           navigate('/admin/dashboard');
-        } else if ((data.role || '').toLowerCase() === 'agence') {
+        } else if (data.role === 'agence') {
           navigate('/agence/dashboard');
+        } else if (fromConfirmation) {
+          // On transmet tous les paramètres de réservation à la page confirmation
+          navigate({
+            pathname: '/confirmation',
+            search: location.search // transmet la query string d'origine
+          });
         } else {
-          setError('Connexion réussie, mais vous n’êtes pas administrateur ou agence.');
+          setError('Connexion réussie, mais vous n’êtes pas administrateur.');
         }
       } else {
         setError('Utilisateur non trouvé dans la base.');
