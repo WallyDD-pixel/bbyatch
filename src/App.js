@@ -41,7 +41,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/search-results" element={<SearchResults />} />
-          <Route path="/bateau/:id" element={<BateauOccasionDetail />} />
+          <Route path="/bateauxoccasion/:id" element={<BateauOccasionDetail />} />
           <Route path="/bateau/:id" element={<BateauDetails />} />
           <Route path="/confirmation" element={<Confirmation />} />
           <Route path="/infos-client" element={<InfosClient />} />

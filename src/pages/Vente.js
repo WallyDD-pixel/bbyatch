@@ -46,7 +46,7 @@ export default function Vente() {
                     minHeight: 420,
                     cursor: 'pointer'
                   }}
-                  onClick={() => navigate(`/bateau/${bateau.id}`)}
+                  onClick={() => navigate(`/bateauxoccasion/${bateau.id}`)}
                 >
                   {bateau.photo && bateau.photo[0] && (
                     <img src={bateau.photo[0]} alt={bateau.nom} style={{ width: "100%", height: 220, objectFit: "cover", borderBottom: '1.5px solid #e5e7eb' }} />
