@@ -23,21 +23,19 @@
   /* Mobile First - Responsive Design */
   @media (max-width: 767px) {
     .search-bar-modern {
-      flex-direction: column;
-      gap: 16px;
-      padding: 20px 16px;
-      border-radius: 16px;
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
-      width: 95%;
-      max-width: 400px;
+      max-width: 340px;
+      padding: 10px 6px;
+      gap: 8px;
+      border-radius: 12px;
     }
 
     .search-item {
       width: 100%;
       justify-content: flex-start;
-      padding: 14px;
+      padding: 8px;
+      gap: 6px;
       background: #f8f9fa;
-      border-radius: 12px;
+      border-radius: 8px;
       border: 1px solid #e9ecef;
       transition: all 0.3s ease;
     }
@@ -54,11 +52,12 @@
 
     .styled-input {
       width: 100%;
-      min-width: unset;
-      padding: 12px 14px;
-      font-size: 15px;
+      min-width: 0;
+      max-width: 100%;
+      padding: 7px 9px;
+      font-size: 13px;
       border: 1px solid #ced4da;
-      border-radius: 8px;
+      border-radius: 6px;
       transition: all 0.3s ease;
     }
 
@@ -70,22 +69,36 @@
 
     .search-btn-icon {
       width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+      min-width: unset;
+      max-width: unset;
+      height: 38px;
+      margin: 8px 0 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 7px; /* rectangle, pas rond */
       font-size: 15px;
+      box-shadow: none;
+      background: linear-gradient(135deg, #1976d2 0%, #0056b3 100%);
+      color: #fff;
+      border: none;
+      transition: background 0.2s;
       font-weight: 600;
-      letter-spacing: 0.3px;
-      transition: all 0.3s ease;
+      gap: 6px;
+      padding: 0 12px;
     }
 
-    .search-btn-icon:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(0, 123, 255, 0.3);
+    .search-btn-icon svg {
+      margin: 0 6px 0 0;
     }
 
-    .search-btn-icon:active {
-      transform: translateY(0);
+    .search-icon {
+      width: 15px;
+      height: 15px;
+    }
+
+    .search-labels label {
+      font-size: 10px;
     }
   }
 
@@ -255,4 +268,58 @@
       background: #e3f2fd;
       color: #1976d2;
     }
+  }
+
+  /* Masquer la date sélectionnée affichée au-dessus du calendrier */
+.react-datepicker__header {
+  display: none;
+}
+
+.react-datepicker__header span,
+.react-datepicker__header .react-datepicker__current-month {
+  display: none !important;
+}
+
+  .search-bar-responsive {
+    display: flex;
+    flex-direction: row;
+    gap: 24px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 900px) {
+    .search-bar-responsive {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 16px;
+    }
+    .search-bar-responsive .search-item {
+      width: 100%;
+    }
+    .search-bar-responsive .search-btn-icon {
+      width: 100%;
+      margin-top: 8px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .search-bar-responsive {
+      padding: 0 8px;
+      gap: 12px;
+    }
+    .search-bar-responsive .search-item {
+      min-width: 0;
+    }
+    .search-bar-responsive .search-labels label {
+      font-size: 15px;
+    }
+    .search-bar-responsive .styled-input {
+      font-size: 15px;
+      padding: 8px;
+    }
+  }
+
+  .datepicker-popper {
+    z-index: 9999 !important;
   }

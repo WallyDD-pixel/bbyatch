@@ -7,6 +7,7 @@ import logo from '../../logo.svg';
 import { FaClipboardUser, FaChevronDown, FaClipboardList, FaIdCard, FaUser, FaCircleUser, FaCircleQuestion, FaRightFromBracket } from 'react-icons/fa6';
 import Modal from 'react-bootstrap/Modal';
 import NavBar from '../../components/NavBar';
+import Footer from '../../components/Footer';
 
 export default function MonEspace() {
   const [user, setUser] = useState(null);
@@ -120,6 +121,7 @@ export default function MonEspace() {
   return (
     <>
       <NavBar />
+      <div style={{ height: 60 }} />
       <div className="container py-5" style={{ maxWidth: 1100, background:'#fff', minHeight:'100vh' }}>
         {/* Message de bienvenue et résumé */}
         <div className="mb-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
@@ -329,6 +331,7 @@ export default function MonEspace() {
           <button className="btn btn-dark" onClick={()=>setShowModal(false)}>Fermer</button>
         </Modal.Footer>
       </Modal>
+      <Footer />
     </>
   );
 }

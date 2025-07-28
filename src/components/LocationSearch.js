@@ -211,11 +211,15 @@ export default function LocationSearch() {
   };
 
   return (
-    <form className="search-bar-modern" onSubmit={handleSubmit}>
-      <div className="search-item">
+    <form
+      className="search-bar-modern search-bar-responsive"
+      onSubmit={handleSubmit}
+      style={{ marginTop: 48, padding: 16, borderRadius: 16, background: '#fff', boxShadow: '0 2px 12px #0001', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12, maxWidth: 900, marginLeft: 'auto', marginRight: 'auto' }}
+    >
+      <div className="search-item" style={{ minWidth: 160, flex: 1, margin: 0 }}>
         <MapPin className="search-icon" />
-        <div className="search-labels">
-          <label>Destination</label>
+        <div className="search-labels" style={{ gap: 2 }}>
+          <label style={{ marginBottom: 2 }}>Destination</label>
           <select
             value={selectedVille}
             onChange={(e) => {
@@ -226,6 +230,7 @@ export default function LocationSearch() {
               setHeureRetour(null);
             }}
             className="styled-input"
+            style={{ minHeight: 36, fontSize: 15 }}
           >
             <option value="">Choisissez une ville</option>
             {villes.map((ville) => (
@@ -237,91 +242,135 @@ export default function LocationSearch() {
         </div>
       </div>
 
-      <div className="search-item">
+      <div className="search-item" style={{ minWidth: 160, flex: 1, margin: 0 }}>
         <CalendarDays className="search-icon" />
-        <div className="search-labels">
-          <label>Départ</label>
-          <DatePicker
-            selected={dateDepart}
-            onChange={(date) => {
-              setDateDepart(date);
-              setHeureDepart(null);
-            }}
-            placeholderText="Date de départ"
-            includeDates={datesDepart}
-            locale={fr}
-            dateFormat="dd/MM/yyyy"
-            dayClassName={(date) =>
-              datesDepart.some(
-                (d) => d.toDateString() === date.toDateString()
-              )
-                ? "available-day"
-                : undefined
-            }
-            className="styled-input"
-          />
+        <div className="search-labels" style={{ gap: 2 }}>
+          <label style={{ marginBottom: 2 }}>Départ</label>
+          <div style={{ position: "relative", zIndex: 3 }}>
+            <DatePicker
+              selected={dateDepart}
+              onChange={(date) => {
+                setDateDepart(date);
+                setHeureDepart(null);
+              }}
+              placeholderText="Date de départ"
+              includeDates={datesDepart}
+              locale={fr}
+              dateFormat="dd/MM/yyyy"
+              dayClassName={(date) =>
+                datesDepart.some(
+                  (d) => d.toDateString() === date.toDateString()
+                )
+                  ? "available-day"
+                  : undefined
+              }
+              className="styled-input"
+              popperPlacement="bottom"
+              popperClassName="datepicker-popper"
+              style={{ minHeight: 36, fontSize: 15 }}
+            />
+          </div>
           {dateDepart && (
-            <DatePicker
-              selected={heureDepart}
-              onChange={(time) => setHeureDepart(time)}
-              showTimeSelect
-              showTimeSelectOnly
-              timeIntervals={30}
-              timeCaption="Heure"
-              dateFormat="HH:mm"
-              locale={fr}
-              includeTimes={getHeuresDisponibles(dateDepart)}
-              placeholderText="Heure de départ"
-              className="styled-input"
-            />
+            <div style={{ position: "relative", zIndex: 2, marginTop: 2 }}>
+              <DatePicker
+                selected={heureDepart}
+                onChange={(time) => setHeureDepart(time)}
+                showTimeSelect
+                showTimeSelectOnly
+                timeIntervals={30}
+                timeCaption="Heure"
+                dateFormat="HH:mm"
+                locale={fr}
+                includeTimes={getHeuresDisponibles(dateDepart)}
+                placeholderText="Heure de départ"
+                className="styled-input"
+                popperPlacement="bottom"
+                popperClassName="datepicker-popper"
+                style={{ minHeight: 36, fontSize: 15 }}
+              />
+            </div>
           )}
         </div>
       </div>
 
-      <div className="search-item">
+      <div className="search-item" style={{ minWidth: 160, flex: 1, margin: 0 }}>
         <CalendarDays className="search-icon" />
-        <div className="search-labels">
-          <label>Retour</label>
-          <DatePicker
-            selected={dateRetour}
-            onChange={(date) => {
-              setDateRetour(date);
-              setHeureRetour(null);
-            }}
-            placeholderText="Date de retour"
-            includeDates={datesRetour}
-            locale={fr}
-            dateFormat="dd/MM/yyyy"
-            dayClassName={(date) =>
-              datesRetour.some(
-                (d) => d.toDateString() === date.toDateString()
-              )
-                ? "available-day"
-                : undefined
-            }
-            className="styled-input"
-          />
-          {dateRetour && (
+        <div className="search-labels" style={{ gap: 2 }}>
+          <label style={{ marginBottom: 2 }}>Retour</label>
+          <div style={{ position: "relative", zIndex: 2 }}>
             <DatePicker
-              selected={heureRetour}
-              onChange={(time) => setHeureRetour(time)}
-              showTimeSelect
-              showTimeSelectOnly
-              timeIntervals={30}
-              timeCaption="Heure"
-              dateFormat="HH:mm"
+              selected={dateRetour}
+              onChange={(date) => {
+                setDateRetour(date);
+                setHeureRetour(null);
+              }}
+              placeholderText="Date de retour"
+              includeDates={datesRetour}
               locale={fr}
-              includeTimes={getHeuresDisponibles(dateRetour)}
-              placeholderText="Heure de retour"
+              dateFormat="dd/MM/yyyy"
+              dayClassName={(date) =>
+                datesRetour.some(
+                  (d) => d.toDateString() === date.toDateString()
+                )
+                  ? "available-day"
+                  : undefined
+              }
               className="styled-input"
+              popperPlacement="bottom"
+              popperClassName="datepicker-popper"
+              style={{ minHeight: 36, fontSize: 15 }}
             />
+          </div>
+          {dateRetour && (
+            <div style={{ position: "relative", zIndex: 1, marginTop: 2 }}>
+              <DatePicker
+                selected={heureRetour}
+                onChange={(time) => setHeureRetour(time)}
+                showTimeSelect
+                showTimeSelectOnly
+                timeIntervals={30}
+                timeCaption="Heure"
+                dateFormat="HH:mm"
+                locale={fr}
+                includeTimes={getHeuresDisponibles(dateRetour)}
+                placeholderText="Heure de retour"
+                className="styled-input"
+                popperPlacement="bottom"
+                popperClassName="datepicker-popper"
+                style={{ minHeight: 36, fontSize: 15 }}
+              />
+            </div>
           )}
         </div>
       </div>
 
-      <button type="submit" className="search-btn-icon" title="Rechercher">
-        <Search size={20} />
-      </button>
+      <div style={{ display: 'flex', alignItems: 'center', margin: 0 }}>
+        <button
+          type="submit"
+          className="search-btn-icon"
+          title="Rechercher"
+          style={{
+            minWidth: 120,
+            height: 36,
+            borderRadius: 7,
+            fontWeight: 700,
+            fontSize: 15,
+            background: "linear-gradient(135deg, #1976d2 0%, #0056b3 100%)",
+            color: "#fff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            boxShadow: "0 2px 8px #1976d222",
+            border: "none",
+            margin: 0,
+            padding: "0 12px"
+          }}
+        >
+          <Search size={18} style={{ marginRight: 6 }} />
+          Rechercher
+        </button>
+      </div>
     </form>
   );
 }

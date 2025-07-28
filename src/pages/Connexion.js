@@ -28,16 +28,19 @@ export default function Connexion() {
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       if (userDoc.exists()) {
         const data = userDoc.data();
-        if (data.role === 'Admin') {
+        if (fromConfirmation) {
+          // On transmet tous les paramètres de réservation à la page confirmation
+          // On retire from=confirmation de la query string pour éviter la boucle
+          const params = new URLSearchParams(location.search);
+          params.delete('from');
+          navigate({
+            pathname: '/confirmation',
+            search: params.toString() ? `?${params.toString()}` : ''
+          });
+        } else if (data.role === 'Admin') {
           navigate('/admin/dashboard');
         } else if (data.role === 'agence') {
           navigate('/agence/dashboard');
-        } else if (fromConfirmation) {
-          // On transmet tous les paramètres de réservation à la page confirmation
-          navigate({
-            pathname: '/confirmation',
-            search: location.search // transmet la query string d'origine
-          });
         } else {
           setError('Connexion réussie, mais vous n’êtes pas administrateur.');
         }

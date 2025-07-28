@@ -1,7 +1,7 @@
 // Dashboard d'administration avec menu latéral et responsive - Style moderne cohérent
 import React, { useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
-import { FaBars, FaCity, FaShip, FaCog, FaUserFriends, FaSignOutAlt, FaClipboardList, FaChevronDown, FaChevronUp, FaCalendarAlt } from 'react-icons/fa';
+import { FaBars, FaCity, FaShip, FaCog, FaUserFriends, FaSignOutAlt, FaClipboardList, FaChevronDown, FaChevronUp, FaCalendarAlt, FaStar } from 'react-icons/fa';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase';
 
@@ -89,6 +89,8 @@ export default function DashboardAdmin() {
           <SidebarLink to="/admin/dashboard/villes" icon={<FaCity />} open={menuOpen} label="Villes" />
           {/* Onglet ajouté pour les demandes particuliers */}
           <SidebarLink to="/admin/dashboard/demandes-particuliers" icon={<FaClipboardList />} open={menuOpen} label="Demandes particuliers" />
+          {/* Onglet ajouté pour les expériences */}
+          <SidebarLink to="/admin/dashboard/experiences" icon={<FaStar />} open={menuOpen} label="Expériences" />
           {/* Dropdown Paramètres */}
           <div style={{ position: 'relative', width: '100%' }}>
             <div

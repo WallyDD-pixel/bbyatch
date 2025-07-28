@@ -31,6 +31,10 @@ import EditerBateau from './pages/agence/EditerBateau';
 import DemandeParticulier from './pages/DemandeParticulier';
 import DemandesParticuliers from './pages/admin/DemandesParticuliers';
 import BateauOccasionDetail from './pages/BateauOccasionDetail';
+import ExperiencePage from './pages/ExperiencePage';
+import AdminExperiences from './pages/admin/AdminExperiences';
+import Recap from './pages/Recap';
+import CGL from './pages/CGL';
 
 
 
@@ -63,6 +67,7 @@ function App() {
             <Route path="settings/services" element={<AdminServicesHome />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="demandes-particuliers" element={<DemandesParticuliers />} />
+            <Route path="experiences" element={<AdminExperiences />} />
           </Route>
           <Route path="/agence/dashboard/*" element={<AgenceDashboard />} />
           
@@ -72,6 +77,9 @@ function App() {
           <Route path="/agence/dashboard/bateaux/:id/disponibilites" element={<EditerDisponibilitesBateau />} />
           <Route path="/agence/dashboard/bateaux/:id/edit" element={<EditerBateau />} />
           <Route path="/demande-particulier" element={<DemandeParticulier />} />
+          <Route path="/experiencepage/:id" element={<ExperiencePage />} />
+          <Route path="/recap" element={<Recap />} />
+          <Route path="/cgl" element={<CGL />} />
         </Routes>
       </div>
     </Router>

@@ -52,6 +52,7 @@ export default function Confirmation() {
   const [userData, setUserData] = useState(null);
   const [form, setForm] = useState({ nom: "", prenom: "", email: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [loadingStripe, setLoadingStripe] = useState(false);
   
   // Total sans protection supplémentaire
   const total = prixBase.toFixed(2);
@@ -74,6 +75,7 @@ export default function Confirmation() {
   }, []);
 
   async function handleContinue() {
+    setLoadingStripe(true);
     let nom = form.nom;
     let prenom = form.prenom;
     let email = form.email;
@@ -84,6 +86,7 @@ export default function Confirmation() {
     }
     if (!user && (!nom || !prenom || !email)) {
       setSubmitted(true);
+      setLoadingStripe(false);
       return;
     }
     // Récupérer les infos de l'URL avec les services
@@ -116,11 +119,16 @@ export default function Confirmation() {
     })
       .then(res => res.json())
       .then(data => {
+        setLoadingStripe(false);
         if (data.url) {
           window.location.href = data.url;
         } else {
           alert("Erreur lors de la création de la session de paiement.");
         }
+      })
+      .catch(() => {
+        setLoadingStripe(false);
+        alert("Erreur lors de la création de la session de paiement.");
       });
   }
 
@@ -138,7 +146,7 @@ export default function Confirmation() {
     <>
       <NavBar />
       <div style={{ 
-        paddingTop: 80, 
+        paddingTop: 120, 
         minHeight: '100vh', 
         backgroundColor: '#f8f9fa',
         fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
@@ -288,13 +296,22 @@ export default function Confirmation() {
                     padding: '12px 32px', 
                     boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)', 
                     border: 'none',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease'
+                    cursor: loadingStripe ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.2s ease',
+                    opacity: loadingStripe ? 0.7 : 1
                   }}
-                  onMouseEnter={(e) => e.target.style.transform = 'translateY(-1px)'}
-                  onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+                  disabled={loadingStripe}
+                  onMouseEnter={e => !loadingStripe && (e.target.style.transform = 'translateY(-1px)')}
+                  onMouseLeave={e => (e.target.style.transform = 'translateY(0)')}
                 >
-                  Procéder au paiement
+                  {loadingStripe ? (
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" style={{ width: 18, height: 18, borderWidth: 2 }}></span>
+                      Redirection vers le paiement...
+                    </span>
+                  ) : (
+                    'Procéder au paiement'
+                  )}
                 </button>
               </div>
             </div>

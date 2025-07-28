@@ -5,6 +5,8 @@ import { db } from "../firebase";
 import { FaUserFriends, FaTachometerAlt, FaGasPump, FaCogs, FaFilter, FaSort } from "react-icons/fa";
 import logo from "../logo.svg";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import NavBar from "../components/NavBar";
+import Footer from "../components/Footer";
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -206,37 +208,8 @@ export default function SearchResults() {
 
   return (
     <>
-      <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm" style={{ position: 'fixed', top: 0, left: 0, width: '100%', zIndex: 1000 }}>
-        <div className="container">
-          <img 
-            src={logo} 
-            alt="BBYATCH logo" 
-            style={{ height: 40, cursor: 'pointer' }} 
-            className="me-2" 
-            onClick={() => navigate('/')}
-          />
-          <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span className="navbar-toggler-icon"></span>
-          </button>
-          <div className="collapse navbar-collapse" id="navbarNav">
-            <ul className="navbar-nav ms-auto">
-              <li className="nav-item">
-                <span className="nav-link" style={{ cursor: 'pointer' }} onClick={() => navigate('/')}>
-                  Accueil
-                </span>
-              </li>
-              <li className="nav-item"><span className="nav-link">Bateaux</span></li>
-              <li className="nav-item"><span className="nav-link">Contact</span></li>
-              <li className="nav-item">
-                <span className="btn btn-outline-primary ms-2" style={{ cursor: 'pointer' }} onClick={() => navigate('/connexion')}>
-                  Connexion
-                </span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav>
-      <div style={{ paddingTop: 56, background: '#fafbfc', minHeight: '100vh' }}>
+      <NavBar />
+      <div style={{ paddingTop: 72, background: '#fafbfc', minHeight: '100vh' }}>
         <div className="container py-4">
           {/* Barre récapitulative sobre et professionnelle - Responsive */}
           <div style={{
@@ -1220,6 +1193,7 @@ export default function SearchResults() {
           ))}
         </div>
       )}
+      <Footer />
     </>
   );
 }

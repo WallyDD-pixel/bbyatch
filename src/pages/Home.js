@@ -5,12 +5,14 @@ import { db, auth } from "../firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { collection, getDocs } from "firebase/firestore";
 import ExperienceSlider from "../components/ExperienceSlider";
-import ServicesSection from "../components/ServicesSection";
 import LocationSearch from "../components/LocationSearch";
 import { useNavigate } from "react-router-dom";
 import { signOut, onAuthStateChanged } from 'firebase/auth';
 import { FaUser, FaChevronDown, FaCar, FaIdCard, FaUserCircle, FaQuestionCircle, FaSignOutAlt, FaClipboardList } from 'react-icons/fa';
 import NavBar from "../components/NavBar";
+import { Users, Gauge, Fuel } from "lucide-react";
+import { FaCogs } from "react-icons/fa";
+import Footer from "../components/Footer";
 
 export default function Home() {
     const [backgroundUrl, setBackgroundUrl] = useState(
@@ -39,6 +41,9 @@ export default function Home() {
       "/bJZMpRoRx8Y3rk6f7jtTssCRVg.avif",
       "/HqnAwA2OxUktnp3Cfbv3TacaXk4.avif"
     ]);
+    const [bateaux, setBateaux] = useState([]);
+    const [loadingBateaux, setLoadingBateaux] = useState(true);
+    const [selectedPhoto, setSelectedPhoto] = useState(null);
     const profileMenuRef = useRef();
     const navigate = useNavigate();
 
@@ -110,6 +115,16 @@ export default function Home() {
     }, []);
 
     useEffect(() => {
+      async function fetchBateaux() {
+        setLoadingBateaux(true);
+        const snap = await getDocs(collection(db, "bateaux"));
+        setBateaux(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        setLoadingBateaux(false);
+      }
+      fetchBateaux();
+    }, []);
+
+    useEffect(() => {
       const handleResize = () => {
         setIsMobile(window.innerWidth < 768);
         setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1024);
@@ -147,11 +162,32 @@ export default function Home() {
           padding: isMobile ? "0 15px" : 0,
         }}
       >
-        <LocationSearch villes={villes} ville={ville} setVille={setVille} />
+        <div style={{width:'100%', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap: isMobile ? 16 : 28}}>
+          {/* Titre déplacé ici, retiré du composant LocationSearch */}
+          <div style={{
+            textAlign: 'center',
+            fontWeight: 800,
+            fontSize: isMobile ? 17 : 22,
+            color: '#232323',
+            margin: '0 auto',
+            letterSpacing: 0.5,
+            textShadow: '0 2px 8px #23232311',
+            background: 'rgba(255,255,255,0.85)',
+            borderRadius: 16,
+            boxShadow: '0 2px 12px #0001',
+            padding: isMobile ? '10px 8px' : '18px 12px',
+            maxWidth: 700,
+            position: 'relative',
+            zIndex: 10
+          }}>
+            BB SERVICE CHARTER - Location de yachts sur la Riviera française et Italienne par BB YACHTS
+          </div>
+          <LocationSearch villes={villes} ville={ville} setVille={setVille} showTitle={false} />
+        </div>
       </header>
 
       {/* Section expérience responsive */}
-      <section className="py-5" style={{ background: '#fafbfc' }}>
+      <section id="experiences" className="py-5" style={{ background: '#fafbfc' }}>
         <div className="container">
           <h2 className="text-center mb-5" style={{ 
             fontWeight: 700, 
@@ -166,90 +202,128 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Galerie photos responsive optimisée iPhone 15 */}
-      <section className="py-5" style={{ background: '#ffffff' }}>
-        <div className="container" style={{ maxWidth: 1100 }}>
-          <div style={{
-            background: '#f8f9fa',
-            borderRadius: isMobile ? 12 : 16,
-            padding: isMobile ? '20px 12px' : isTablet ? '32px 24px' : '48px 40px',
-            border: '1px solid #e1e5e9',
-            position: 'relative',
-            margin: isMobile ? '0 8px' : '0 auto'
-          }}>
-            {/* Ligne décorative responsive */}
-            <div style={{
-              position: 'absolute',
-              top: 0,
-              left: isMobile ? 12 : isTablet ? 24 : 40,
-              right: isMobile ? 12 : isTablet ? 24 : 40,
-              height: isMobile ? 3 : 4,
-              background: 'linear-gradient(90deg, #2c3e50 0%, #34495e 100%)',
-              borderRadius: '0 0 2px 2px'
-            }}></div>
-            
-            <h2 className="text-center mb-4" style={{ 
-              fontWeight: 700, 
-              fontSize: isMobile ? 20 : isTablet ? 26 : 32, 
-              color: '#2c3e50',
-              letterSpacing: -0.5,
-              paddingTop: 8,
-              marginBottom: isMobile ? '20px' : '32px'
-            }}>
-              Galerie photos
-            </h2>
-            
-            {/* Grille optimisée pour iPhone 15 et autres mobiles */}
-            <div className={`row g-${isMobile ? '3' : '4'} justify-content-center`}>
-              {galerieImages.map((src, idx) => (
-                <div 
-                  className={isMobile ? "col-6" : "col-12 col-md-6"} 
-                  key={idx}
-                  style={{ 
-                    padding: isMobile ? '6px' : undefined 
+      {/* Liste des 3 bateaux les plus récents, style moderne, pas de bleu, icône moteur réaliste */}
+      <div id="bateaux" style={{ paddingTop: 80, background: "#f8f9fa", minHeight: "100vh" }}>
+        <div className="container py-4">
+          <h2 className="text-center mb-4" style={{ fontWeight: 800, fontSize: 36, color: "#232323", letterSpacing: 0.5, textShadow: '0 2px 8px #23232311' }}>Bateaux disponibles</h2>
+          {loadingBateaux && <div style={{textAlign:'center', color:'#232323', fontWeight:600, fontSize:20}}>Chargement...</div>}
+          {!loadingBateaux && bateaux.length === 0 && <div style={{textAlign:'center', color:'#888', fontWeight:500, fontSize:18}}>Aucun bateau disponible.</div>}
+          <div className="row" style={{gap: '32px 0'}}>
+            {bateaux
+              .sort((a, b) => (b.createdAt && a.createdAt ? new Date(b.createdAt) - new Date(a.createdAt) : 0))
+              .slice(0, 3)
+              .map(bateau => (
+              <div
+                key={bateau.id}
+                className="col-12 col-md-6 col-lg-4 mb-4 d-flex"
+              >
+                <div
+                  className="card w-100 h-100"
+                  style={{
+                    borderRadius: 24,
+                    boxShadow: "0 6px 32px #0001",
+                    overflow: "hidden",
+                    background: '#fff',
+                    border: 'none',
+                    color: '#232323',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    minHeight: 480,
+                    position: 'relative',
+                    padding: 0,
+                    cursor: "pointer"
+                  }}
+                  onClick={() => { window.location.href = `/bateau/${bateau.id}`; }}
+                  tabIndex={0}
+                  role="button"
+                  onKeyDown={e => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      window.location.href = `/bateau/${bateau.id}`;
+                    }
                   }}
                 >
-                  <div style={{ 
-                    borderRadius: isMobile ? 8 : 16, 
-                    overflow: 'hidden', 
-                    boxShadow: isMobile ? '0 2px 12px rgba(0, 0, 0, 0.08)' : '0 4px 20px rgba(0, 0, 0, 0.1)', 
-                    background: '#fff',
-                    border: '1px solid #e1e5e9',
-                    transition: 'all 0.3s ease',
-                    width: '100%'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isMobile) {
-                      e.currentTarget.style.transform = 'translateY(-4px)';
-                      e.currentTarget.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.15)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isMobile) {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
-                    }
-                  }}>
-                    <img 
-                      src={src} 
-                      alt={`Galerie ${idx + 1}`} 
-                      style={{ 
-                        width: '100%', 
-                        height: isMobile ? 120 : isTablet ? 200 : 250, 
-                        objectFit: 'cover',
-                        display: 'block',
-                        maxWidth: '100%',
-                        borderRadius: 'inherit'
-                      }} 
-                    />
+                  <div style={{ position: 'relative' }}>
+                    {bateau.photo && bateau.photo[0] && (
+                      <img src={bateau.photo[0]} alt={bateau.nom} style={{ width: "100%", height: 220, objectFit: "cover", borderTopLeftRadius: 24, borderTopRightRadius: 24 }} />
+                    )}
+                    <div style={{ position: 'absolute', top: 18, right: 18, background: '#fff', color: '#232323', fontWeight: 700, fontSize: 18, borderRadius: 16, boxShadow: '0 2px 8px #23232311', padding: '7px 18px', zIndex: 2, border: '1px solid #e5e7eb' }}>{bateau.prix} €</div>
+                  </div>
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', padding: 32, paddingBottom: 18, background: '#fff' }}>
+                    <h5 style={{ fontWeight: 700, color: '#232323', fontSize: 22, marginBottom: 18, textAlign: 'center' }}>{bateau.nom}</h5>
+                    <div style={{ background: '#f8fafc', borderRadius: 14, border: '1px solid #e5e7eb', padding: 18, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18, width: '100%', maxWidth: 320, marginBottom: 18 }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                        <Users size={22} color="#232323" />
+                        <span style={{ fontSize: 13, color: '#888', fontWeight: 600 }}>PLACES</span>
+                        <span style={{ fontWeight: 700, fontSize: 16 }}>{bateau.places}</span>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                        <Gauge size={22} color="#232323" />
+                        <span style={{ fontSize: 13, color: '#888', fontWeight: 600 }}>VITESSE</span>
+                        <span style={{ fontWeight: 700, fontSize: 16 }}>{bateau.vitesse} kn</span>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                        <Fuel size={22} color="#232323" />
+                        <span style={{ fontSize: 13, color: '#888', fontWeight: 600 }}>CARBURANT</span>
+                        <span style={{ fontWeight: 700, fontSize: 16 }}>{bateau.carburant}</span>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                        <FaCogs size={22} color="#232323" />
+                        <span style={{ fontSize: 13, color: '#888', fontWeight: 600 }}>MOTEUR</span>
+                        <span style={{ fontWeight: 700, fontSize: 16 }}>{bateau.moteur}</span>
+                      </div>
+                    </div>
+                    <hr style={{ width: '80%', margin: '18px auto 10px auto', border: 'none', borderTop: '1.5px solid #e5e7eb' }} />
+                    <div style={{ color: '#888', fontSize: 15, textAlign: 'center', marginTop: 0, fontWeight: 500 }}>Cliquer pour voir les détails →</div>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <style>{`
+        .card:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 12px 36px #23232311; }
+      `}</style>
+
+      {/* Galerie photo 2x2 */}
+      <section id="galerie" className="py-5" style={{ background: '#fff' }}>
+        <div className="container">
+          <h2 className="text-center mb-5" style={{ fontWeight: 700, fontSize: isMobile ? 22 : isTablet ? 28 : 32, color: '#2c3e50', letterSpacing: -0.5 }}>Notre galerie photo</h2>
+          <div className="row justify-content-center" style={{ gap: 0 }}>
+            {galerieImages.slice(0, 4).map((img, idx) => (
+              <React.Fragment key={idx}>
+                <div className="col-12 col-md-6 mb-4 d-flex align-items-center justify-content-center">
+                  <img src={img} alt={`galerie-${idx}`} style={{ width: '100%', maxWidth: 420, height: 260, objectFit: 'cover', borderRadius: 18, boxShadow: '0 4px 24px #0001', cursor: 'pointer', marginBottom: 0 }} onClick={() => setSelectedPhoto(img)} />
+                </div>
+                {idx === 1 && <div className="w-100 d-none d-md-block" />}
+              </React.Fragment>
+            ))}
           </div>
         </div>
       </section>
-      <ServicesSection />
+
+      {/* Modale d'affichage de la photo */}
+      {selectedPhoto && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.8)',
+          zIndex: 2000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+        onClick={() => setSelectedPhoto(null)}
+        >
+          <img src={selectedPhoto} alt="Aperçu" style={{ maxWidth: '90vw', maxHeight: '80vh', borderRadius: 18, boxShadow: '0 8px 32px #0008' }} />
+          <button onClick={() => setSelectedPhoto(null)} style={{ position: 'fixed', top: 30, right: 40, fontSize: 36, color: '#fff', background: 'none', border: 'none', cursor: 'pointer', zIndex: 2100 }}>&times;</button>
+        </div>
+      )}
+
+      <Footer />
     </div>
   );
 }

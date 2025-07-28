@@ -126,6 +126,105 @@ h1, h2, h3, h4, h5, h6, .titre-playfair {
   border-radius: 50% !important;
 }
 
+/* --- NAVBAR PILL ARRONDIE --- */
+.pill-navbar {
+  background: #fff;
+  border-radius: 40px;
+  box-shadow: 0 4px 24px rgba(30,60,90,0.10);
+  padding: 8px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 24px auto 0 auto;
+  max-width: 900px;
+  min-height: 56px;
+  position: relative;
+  z-index: 1000;
+}
+.pill-navbar .pill-nav-list {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pill-navbar .pill-nav-link {
+  display: flex;
+  align-items: center;
+  padding: 8px 22px;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+  background: transparent;
+  border: none;
+  transition: background 0.18s, color 0.18s;
+  cursor: pointer;
+}
+.pill-navbar .pill-nav-link.active,
+.pill-navbar .pill-nav-link:hover {
+  background: linear-gradient(90deg, #e0e7ff 0%, #bae6fd 100%);
+  color: #2563eb;
+}
+.pill-navbar .pill-nav-user {
+  margin-left: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f1f5f9;
+  border-radius: 30px;
+  padding: 8px 18px;
+  font-weight: 600;
+  color: #2563eb;
+  cursor: pointer;
+  border: none;
+}
+.pill-navbar .pill-nav-user:hover {
+  background: #dbeafe;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .pill-navbar {
+    max-width: 98vw;
+    padding: 6px 8px;
+  }
+  .pill-navbar .pill-nav-list {
+    gap: 10px;
+  }
+  .pill-navbar .pill-nav-link {
+    font-size: 15px;
+    padding: 8px 12px;
+  }
+}
+@media (max-width: 600px) {
+  .pill-navbar {
+    flex-direction: column;
+    border-radius: 18px;
+    padding: 8px 4px;
+    min-height: 44px;
+  }
+  .pill-navbar .pill-nav-list {
+    flex-direction: column;
+    width: 100%;
+    gap: 0;
+  }
+  .pill-navbar .pill-nav-link {
+    width: 100%;
+    border-radius: 12px;
+    margin-bottom: 4px;
+    justify-content: flex-start;
+  }
+  .pill-navbar .pill-nav-user {
+    width: 100%;
+    border-radius: 12px;
+    margin-left: 0;
+    margin-top: 6px;
+    justify-content: flex-start;
+  }
+}
+
 /* Responsive amélioré */
 @media (max-width: 900px) {
   h1, h2, h3, h4, h5, h6, .titre-playfair {
@@ -341,5 +440,11 @@ h1, h2, h3, h4, h5, h6, .titre-playfair {
   
   .table {
     margin-bottom: 0 !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding-top: 110px; /* Ajuste selon la hauteur réelle de ta navbar */
   }
 }
