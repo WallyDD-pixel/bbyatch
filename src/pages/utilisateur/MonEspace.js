@@ -31,6 +31,7 @@ export default function MonEspace() {
   const [passwordError, setPasswordError] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [bateauxMap, setBateauxMap] = useState({});
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const profileMenuRef = useRef();
 
   useEffect(() => {
@@ -86,6 +87,12 @@ export default function MonEspace() {
     }
   }, [compteTab, infos, phone, countryCode]);
 
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   async function fetchReservations(uid) {
     const q = query(collection(db, 'reservations'), where('userId', '==', uid));
     const snap = await getDocs(q);
@@ -122,14 +129,14 @@ export default function MonEspace() {
     <>
       <NavBar />
       <div style={{ height: 60 }} />
-      <div className="container py-5" style={{ maxWidth: 1100, background:'#fff', minHeight:'100vh' }}>
+      <div className="container py-5" style={{ maxWidth: 1100, background:'#fff', minHeight:'100vh', borderRadius: 24, boxShadow: '0 4px 32px #0001', padding: '48px 32px', margin: '32px auto' }}>
         {/* Message de bienvenue et résumé */}
-        <div className="mb-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
-          <div>
-            <h2 className="titre-playfair mb-1" style={{color:'#222', fontWeight:800, fontSize:32}}>Bienvenue, {infos.prenom} !</h2>
-            <div style={{color:'#555', fontSize:18}}>Voici votre tableau de bord utilisateur.</div>
+        <div className="mb-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3" style={{flexWrap: 'nowrap', gap: 32}}>
+          <div style={{flex: 1, minWidth: 0}}>
+            <h2 className="titre-playfair mb-1" style={{color:'#222', fontWeight:800, fontSize:32, textAlign: 'left', marginBottom: 8}}>Bienvenue, {infos.prenom} !</h2>
+            <div style={{color:'#555', fontSize:18, textAlign: 'left'}}>Voici votre tableau de bord utilisateur.</div>
           </div>
-          <div className="d-flex gap-3 flex-wrap">
+          <div className="d-flex gap-3 flex-wrap justify-content-center" style={{gap: 24}}>
             <div style={{background:'#f8f9fa', borderRadius:16, padding:'18px 32px', minWidth:180, color:'#222', boxShadow:'0 2px 12px #0001', border:'1.5px solid #e5e7eb', display:'flex', flexDirection:'column', alignItems:'center'}}>
               <FaClipboardList style={{fontSize:32, color:'#1e90ff', marginBottom:8}} />
               <div style={{fontWeight:700, fontSize:28}}>{reservations.length}</div>
@@ -143,12 +150,12 @@ export default function MonEspace() {
           </div>
         </div>
         {/* Navigation dashboard */}
-        <ul className="nav nav-tabs mb-4" style={{borderBottom:'1.5px solid #e5e7eb', background:'#fff'}}>
-          <li className="nav-item">
-            <button className={`nav-link${tab==='reservations'?' active':''}`} style={{background:'none', color:tab==='reservations'?'#1e90ff':'#555', border:'none', borderBottom:tab==='reservations'?'2.5px solid #1e90ff':'none', fontWeight:700, fontSize:17, borderRadius:0}} onClick={()=>setTab('reservations')}>Mes réservations</button>
+        <ul className="nav nav-tabs mb-4" style={{borderBottom:'1.5px solid #e5e7eb', background:'#fff', flexWrap: 'nowrap', fontSize: 17}}>
+          <li className="nav-item" style={{width: '50%'}}>
+            <button className={`nav-link${tab==='reservations'?' active':''}`} style={{background:'none', color:tab==='reservations'?'#1e90ff':'#555', border:'none', borderBottom:tab==='reservations'?'2.5px solid #1e90ff':'none', fontWeight:700, fontSize: 17, borderRadius:0, width: '100%'}} onClick={()=>setTab('reservations')}>Mes réservations</button>
           </li>
-          <li className="nav-item">
-            <button className={`nav-link${tab==='compte'?' active':''}`} style={{background:'none', color:tab==='compte'?'#1e90ff':'#555', border:'none', borderBottom:tab==='compte'?'2.5px solid #1e90ff':'none', fontWeight:700, fontSize:17, borderRadius:0}} onClick={()=>setTab('compte')}>Mon compte</button>
+          <li className="nav-item" style={{width: '50%'}}>
+            <button className={`nav-link${tab==='compte'?' active':''}`} style={{background:'none', color:tab==='compte'?'#1e90ff':'#555', border:'none', borderBottom:tab==='compte'?'2.5px solid #1e90ff':'none', fontWeight:700, fontSize: 17, borderRadius:0, width: '100%'}} onClick={()=>setTab('compte')}>Mon compte</button>
           </li>
         </ul>
         {/* Section réservations avec aperçu rapide */}
@@ -235,35 +242,45 @@ export default function MonEspace() {
                   <div style={{background:'#fff', borderRadius:18, boxShadow:'0 2px 16px #0001', padding:32, border:'1.5px solid #e5e7eb', color:'#222', marginBottom:24}}>
                     <h4 style={{color:'#222', fontWeight:700, marginBottom:8}}>Informations personnelles</h4>
                     <div style={{color:'#888', marginBottom:18}}>Modifiez votre nom, prénom et numéro de téléphone.</div>
-                    <form>
-                      <div className="row mb-4">
-                        <div className="col-6">
-                          <label className="form-label" style={{fontWeight:700, color:'#222'}}>Nom</label>
-                          <input type="text" className="form-control" value={formInfos.nom} onChange={e=>setFormInfos({...formInfos, nom:e.target.value})} style={{fontWeight:600, color:'#222', background:'#f8f9fa', border:'1.5px solid #e5e7eb', borderRadius:10, boxShadow:'none'}} />
+                    <form style={{ padding: isMobile ? '0 8px' : 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <div className="row mb-4 w-100" style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? 0 : 16 }}>
+                        <div className="col-12 col-md-6 mb-3 mb-md-0 d-flex flex-column align-items-center" style={{ width: isMobile ? '100%' : '50%' }}>
+                          <label className="form-label" style={{fontWeight:700, color:'#222', width: '100%', textAlign: isMobile ? 'center' : 'left'}}>Nom</label>
+                          <input type="text" className="form-control" value={formInfos.nom} onChange={e=>setFormInfos({...formInfos, nom:e.target.value})} style={{fontWeight:600, color:'#222', background:'#f8f9fa', border:'1.5px solid #e5e7eb', borderRadius:10, boxShadow:'none', fontSize: isMobile ? 15 : 16, padding: isMobile ? '10px 12px' : '12px 18px', marginBottom: isMobile ? 12 : 0, maxWidth: 220, width: '100%'}} />
                         </div>
-                        <div className="col-6">
-                          <label className="form-label" style={{fontWeight:700, color:'#222'}}>Prénom</label>
-                          <input type="text" className="form-control" value={formInfos.prenom} onChange={e=>setFormInfos({...formInfos, prenom:e.target.value})} style={{fontWeight:600, color:'#222', background:'#f8f9fa', border:'1.5px solid #e5e7eb', borderRadius:10, boxShadow:'none'}} />
+                        <div className="col-12 col-md-6 d-flex flex-column align-items-center" style={{ width: isMobile ? '100%' : '50%' }}>
+                          <label className="form-label" style={{fontWeight:700, color:'#222', width: '100%', textAlign: isMobile ? 'center' : 'left'}}>Prénom</label>
+                          <input type="text" className="form-control" value={formInfos.prenom} onChange={e=>setFormInfos({...formInfos, prenom:e.target.value})} style={{fontWeight:600, color:'#222', background:'#f8f9fa', border:'1.5px solid #e5e7eb', borderRadius:10, boxShadow:'none', fontSize: isMobile ? 15 : 16, padding: isMobile ? '10px 12px' : '12px 18px', marginBottom: isMobile ? 12 : 0, maxWidth: 220, width: '100%'}} />
                         </div>
                       </div>
-                      <div className="row mb-4">
-                        <div className="col-4">
-                          <label className="form-label" style={{fontWeight:700, color:'#222'}}>Code du pays</label>
-                          <select className="form-control" value={formCountryCode} onChange={e=>setFormCountryCode(e.target.value)} style={{fontWeight:600, color:'#222', background:'#f8f9fa', border:'1.5px solid #e5e7eb', borderRadius:10}}>
+                      <div className="row mb-4 w-100" style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? 0 : 16 }}>
+                        <div className="col-12 col-md-4 mb-3 mb-md-0 d-flex flex-column align-items-center" style={{ width: isMobile ? '100%' : '33%' }}>
+                          <label className="form-label" style={{fontWeight:700, color:'#222', width: '100%', textAlign: isMobile ? 'center' : 'left'}}>Code du pays</label>
+                          <select className="form-control" value={formCountryCode} onChange={e=>setFormCountryCode(e.target.value)} style={{fontWeight:600, color:'#222', background:'#f8f9fa', border:'1.5px solid #e5e7eb', borderRadius:10, fontSize: isMobile ? 15 : 16, padding: isMobile ? '10px 12px' : '12px 18px', marginBottom: isMobile ? 12 : 0, maxWidth: 120, width: '100%'}}>
                             <option value="+33">+33</option>
                             <option value="+32">+32</option>
                             <option value="+41">+41</option>
                             <option value="+1">+1</option>
                           </select>
                         </div>
-                        <div className="col-8">
-                          <label className="form-label" style={{fontWeight:700, color:'#222'}}>Numéro de téléphone</label>
-                          <input type="tel" className="form-control" value={formPhone} onChange={e=>setFormPhone(e.target.value)} style={{fontWeight:600, color:'#222', background:'#f8f9fa', border:'1.5px solid #e5e7eb', borderRadius:10}} />
+                        <div className="col-12 col-md-8 d-flex flex-column align-items-center" style={{ width: isMobile ? '100%' : '67%' }}>
+                          <label className="form-label" style={{fontWeight:700, color:'#222', width: '100%', textAlign: isMobile ? 'center' : 'left'}}>Numéro de téléphone</label>
+                          <input type="tel" className="form-control" value={formPhone} onChange={e=>setFormPhone(e.target.value)} style={{fontWeight:600, color:'#222', background:'#f8f9fa', border:'1.5px solid #e5e7eb', borderRadius:10, fontSize: isMobile ? 15 : 16, padding: isMobile ? '10px 12px' : '12px 18px', marginBottom: isMobile ? 12 : 0, maxWidth: 220, width: '100%'}} />
                         </div>
                       </div>
                       <button className="btn" style={{background:'#1e90ff', color:'#fff', fontWeight:700, width:250, borderRadius:12, fontSize:18, boxShadow:'0 2px 8px #1e90ff22'}} type="button" onClick={handleSave}>Enregistrer</button>
                       <div className="mt-4">
-                        <button type="button" className="btn btn-link text-danger" style={{fontWeight:600, textDecoration:'none'}}> <i className="fa fa-trash" /> Supprimer le compte</button>
+                        <button type="button" className="btn btn-link text-danger" style={{fontWeight:600, textDecoration:'none'}} onClick={async () => {
+  if (!window.confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')) return;
+  try {
+    await updateDoc(doc(db, 'users', user.uid), { deleted: true });
+    await user.delete();
+    await auth.signOut();
+    window.location.href = '/';
+  } catch (err) {
+    alert('Erreur lors de la suppression du compte : ' + err.message);
+  }
+}}> <i className="fa fa-trash" /> Supprimer le compte</button>
                       </div>
                     </form>
                   </div>
@@ -324,7 +341,7 @@ export default function MonEspace() {
         <Modal.Body style={{background:'#fff', color:'#111'}}>
           {success}
           <div className="mt-3">
-            <a href="#" onClick={()=>{setShowModal(false); setTab('infos');}} style={{color:'#111', fontWeight:700, textDecoration:'underline'}}>Voir mes informations</a>
+            <a href="#" onClick={(e)=>{e.preventDefault(); setShowModal(false); setTab('infos');}} style={{color:'#111', fontWeight:700, textDecoration:'underline'}}>Voir mes informations</a>
           </div>
         </Modal.Body>
         <Modal.Footer style={{background:'#fff', borderTop:'1px solid #222'}}>

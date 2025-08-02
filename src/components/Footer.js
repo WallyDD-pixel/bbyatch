@@ -84,12 +84,9 @@ export default function Footer() {
         </div>
         {/* Colonne 3 : Logo & branding */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8, position: 'relative' }}>
-          <div style={{ fontWeight: 900, fontSize: 22, letterSpacing: 1, textTransform: 'uppercase', color: '#fff', textAlign: 'right' }}>BBYATCH</div>
+          <div style={{ fontWeight: 900, fontSize: 22, letterSpacing: 1, textTransform: 'uppercase', color: '#fff', textAlign: 'right', cursor: 'pointer' }} onClick={() => window.location.href = '/'}>BBYATCH</div>
           <div style={{ fontSize: 14, color: '#e0e0e0', textAlign: 'right' }}>{footerData.copyright}</div>
-          <div style={{ fontSize: 13, color: '#bbb', display: 'flex', alignItems: 'center', gap: 5, justifyContent: 'flex-end' }}>
-            Made with <FaHeart color="#ffd700" style={{ verticalAlign: 'middle' }} /> on the French Riviera
-          </div>
-          <img src={require('../logo.svg')} alt="BBYatch logo" className="footer-logo-bbyatch" style={{
+          <img src={require('../logo.svg').default} alt="BBYatch logo" className="footer-logo-bbyatch" style={{
             position: 'absolute',
             right: 0,
             bottom: -8,

@@ -1,9 +1,10 @@
 // Dashboard d'administration avec menu latéral et responsive - Style moderne cohérent
 import React, { useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
-import { FaBars, FaCity, FaShip, FaCog, FaUserFriends, FaSignOutAlt, FaClipboardList, FaChevronDown, FaChevronUp, FaCalendarAlt, FaStar } from 'react-icons/fa';
+import { FaBars, FaCity, FaShip, FaCog, FaUserFriends, FaSignOutAlt, FaClipboardList, FaChevronDown, FaChevronUp, FaCalendarAlt, FaStar, FaTools } from 'react-icons/fa';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase';
+import AdminServicesPage from './AdminServicesPage';
 
 export default function DashboardAdmin() {
   const [menuOpen, setMenuOpen] = useState(true);
@@ -91,6 +92,8 @@ export default function DashboardAdmin() {
           <SidebarLink to="/admin/dashboard/demandes-particuliers" icon={<FaClipboardList />} open={menuOpen} label="Demandes particuliers" />
           {/* Onglet ajouté pour les expériences */}
           <SidebarLink to="/admin/dashboard/experiences" icon={<FaStar />} open={menuOpen} label="Expériences" />
+          {/* Onglet ajouté pour les services supplémentaires */}
+          <SidebarLink to="/admin/dashboard/services" icon={<FaTools />} open={menuOpen} label="Services supplémentaires" />
           {/* Dropdown Paramètres */}
           <div style={{ position: 'relative', width: '100%' }}>
             <div
@@ -339,3 +342,6 @@ function SidebarLink({ to, icon, open, label }) {
     </Link>
   );
 }
+
+// Ajout des routes dans le fichier de configuration des routes
+// <Route path="services" element={<AdminServicesPage />} />

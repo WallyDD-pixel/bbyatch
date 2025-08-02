@@ -17,7 +17,8 @@ import {
   FaLightbulb
 } from 'react-icons/fa';
 
-export default function AgenceServices() {
+// Ajout d'une prop pour mode admin
+export default function AgenceServices({ isAdmin = false }) {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -48,13 +49,18 @@ export default function AgenceServices() {
 
   async function fetchServices() {
     try {
-      const user = auth.currentUser;
-      if (!user) return;
-      
-      const servicesQuery = query(
-        collection(db, 'services'),
-        where('agenceId', '==', user.uid)
-      );
+      let servicesQuery;
+      if (isAdmin) {
+        // En mode admin, on récupère tous les services
+        servicesQuery = collection(db, 'services');
+      } else {
+        const user = auth.currentUser;
+        if (!user) return;
+        servicesQuery = query(
+          collection(db, 'services'),
+          where('agenceId', '==', user.uid)
+        );
+      }
       const snap = await getDocs(servicesQuery);
       setServices(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
       setLoading(false);

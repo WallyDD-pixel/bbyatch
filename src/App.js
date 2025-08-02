@@ -1,4 +1,6 @@
 import React from 'react';
+import { I18nextProvider } from 'react-i18next';
+import i18n from './i18n';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Home from './pages/Home';
@@ -35,14 +37,16 @@ import ExperiencePage from './pages/ExperiencePage';
 import AdminExperiences from './pages/admin/AdminExperiences';
 import Recap from './pages/Recap';
 import CGL from './pages/CGL';
+import AgenceServices from './pages/agence/AgenceServices';
 
 
 
 function App() {
   return (
-    <Router>
-      <div className="App">
-        <Routes>
+    <I18nextProvider i18n={i18n}>
+      <Router>
+        <div className="App">
+          <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/search-results" element={<SearchResults />} />
           <Route path="/bateauxoccasion/:id" element={<BateauOccasionDetail />} />
@@ -65,6 +69,7 @@ function App() {
             <Route path="settings/homepage" element={<AdminHomepage />} />
             <Route path="settings/presentation" element={<AdminPresentationHome />} />
             <Route path="settings/services" element={<AdminServicesHome />} />
+            <Route path="services" element={<AgenceServices isAdmin={true} />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="demandes-particuliers" element={<DemandesParticuliers />} />
             <Route path="experiences" element={<AdminExperiences />} />
@@ -80,9 +85,10 @@ function App() {
           <Route path="/experiencepage/:id" element={<ExperiencePage />} />
           <Route path="/recap" element={<Recap />} />
           <Route path="/cgl" element={<CGL />} />
-        </Routes>
-      </div>
-    </Router>
+          </Routes>
+        </div>
+      </Router>
+    </I18nextProvider>
   );
 }
 

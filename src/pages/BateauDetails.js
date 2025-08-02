@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { doc, getDoc, query, collection, where, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
-import { FaUserFriends, FaTachometerAlt, FaGasPump, FaCogs, FaMapMarkerAlt, FaCalendarAlt, FaClock, FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import logo from "../logo.svg";
+import { FaUserFriends, FaTachometerAlt, FaGasPump, FaCogs, FaMapMarkerAlt, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import NavBar from "../components/NavBar";
+import LanguageSwitcher from "../components/LanguageSwitcher";
 
 export default function BateauDetails() {
   const { id } = useParams();
@@ -167,9 +167,17 @@ export default function BateauDetails() {
     </div>
   );
 
+  // Vérification de la date de réservation
+  const today = new Date('2025-08-01'); // Date système
+  const dateDebutObj = dateDebut ? new Date(dateDebut) : null;
+  const isDateDebutValid = dateDebutObj && dateDebutObj >= today;
+
   return (
     <>
       <NavBar />
+      <LanguageSwitcher />
+      <div style={{ height: 24 }} />
+
       <div style={{ 
         backgroundColor: '#f8f9fa',
         minHeight: '100vh',
@@ -177,37 +185,49 @@ export default function BateauDetails() {
         paddingBottom: 40
       }}>
         <div className="container">
-          <div style={{
-            backgroundColor: '#ffffff',
-            borderRadius: 8,
-            overflow: 'hidden',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
-            border: '1px solid #e9ecef',
-            maxWidth: 1000,
-            margin: '0 auto'
-          }}>
+          <div
+            style={{
+              backgroundColor: '#fff',
+              borderRadius: 16,
+              boxShadow: '0 2px 10px rgba(0,0,0,0.10)',
+              border: '1.5px solid #e5e7eb',
+              maxWidth: isMobile ? '98vw' : 1000,
+              margin: isMobile ? '12px auto' : '0 auto',
+              padding: isMobile ? '16px 6px' : '40px',
+              overflow: 'hidden',
+              position: 'relative',
+              minHeight: isMobile ? 0 : 480,
+              color: '#232323',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
             
             {/* Header sobre */}
             <div style={{ 
-              padding: '40px 40px 30px',
+              padding: isMobile ? '24px 12px 18px' : '40px 40px 30px',
               borderBottom: '1px solid #e9ecef'
             }}>
               <div className="row align-items-center">
                 <div className="col-md-8">
                   <h1 style={{ 
-                    fontSize: isMobile ? 24 : 32, 
+                    fontSize: isMobile ? 20 : 32, 
                     fontWeight: 600, 
                     color: '#343a40',
                     margin: 0,
-                    marginBottom: 8
+                    marginBottom: isMobile ? 4 : 8,
+                    textAlign: isMobile ? 'center' : 'left',
                   }}>
                     {bateau.nom}
                   </h1>
                   <p style={{ 
-                    fontSize: 16, 
+                    fontSize: isMobile ? 13 : 16, 
                     color: '#6c757d',
                     margin: 0,
-                    fontWeight: 500
+                    fontWeight: 500,
+                    textAlign: isMobile ? 'center' : 'left',
                   }}>
                     <FaMapMarkerAlt style={{ marginRight: 8, color: '#495057' }} />
                     {bateau.Ville}
@@ -215,13 +235,14 @@ export default function BateauDetails() {
                 </div>
                 <div className="col-md-4 text-md-end">
                   <div style={{ 
-                    fontSize: 28, 
+                    fontSize: isMobile ? 18 : 28, 
                     fontWeight: 700, 
-                    color: '#343a40'
+                    color: '#343a40',
+                    textAlign: isMobile ? 'center' : 'right',
                   }}>
                     {bateau.prix}€
                     <span style={{ 
-                      fontSize: 16, 
+                      fontSize: isMobile ? 12 : 16, 
                       color: '#6c757d', 
                       fontWeight: 500 
                     }}>
@@ -236,9 +257,11 @@ export default function BateauDetails() {
             {images.length > 0 && (
               <div style={{ 
                 position: 'relative',
-                height: isMobile ? 300 : 400,
+                height: isMobile ? 'min(280px, 45vw)' : 400, // Hauteur relative sur mobile
+                maxHeight: isMobile ? '60vh' : 400, // Ne dépasse pas 60% de la hauteur écran
                 backgroundColor: '#f8f9fa',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                borderRadius: isMobile ? 8 : 0,
               }}>
                 <img 
                   src={images[currentImageIndex]} 
@@ -246,8 +269,11 @@ export default function BateauDetails() {
                   style={{ 
                     width: '100%', 
                     height: '100%', 
-                    objectFit: 'cover',
-                    transition: 'opacity 0.3s ease'
+                    objectFit: isMobile ? 'contain' : 'cover',
+                    transition: 'opacity 0.3s ease',
+                    borderRadius: isMobile ? 8 : 0,
+                    background: isMobile ? '#fff' : 'none',
+                    maxHeight: isMobile ? '60vh' : '100%', // Ne déborde pas
                   }} 
                 />
                 
@@ -322,68 +348,73 @@ export default function BateauDetails() {
 
                 {/* Indicateurs */}
                 {images.length > 1 && (
-                  <div style={{
-                    position: 'absolute',
-                    bottom: 20,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    display: 'flex',
-                    gap: 8,
-                    zIndex: 10
-                  }}>
+                  <div
+                    className={isMobile ? 'slider-indicators-mobile' : 'slider-indicators-desktop'}
+                    style={{
+                      position: isMobile ? 'static' : 'absolute',
+                      bottom: isMobile ? 'auto' : 20,
+                      left: isMobile ? 'auto' : '50%',
+                      transform: isMobile ? 'none' : 'translateX(-50%)',
+                      display: 'flex',
+                      gap: isMobile ? 12 : 8,
+                      zIndex: 10,
+                      justifyContent: 'center',
+                      width: '100%',
+                      marginTop: isMobile ? 12 : 0,
+                      marginBottom: isMobile ? 8 : 0,
+                      pointerEvents: 'auto',
+                    }}
+                  >
                     {images.map((_, index) => (
                       <button
                         key={index}
+                        className="slider-indicator-btn"
                         onClick={() => setCurrentImageIndex(index)}
                         style={{
-                          width: 12,
-                          height: 12,
+                          width: isMobile ? 18 : 12,
+                          height: isMobile ? 18 : 12,
+                          aspectRatio: '1/1',
                           borderRadius: '50%',
                           border: '2px solid #fff',
                           backgroundColor: index === currentImageIndex ? '#495057' : 'rgba(255,255,255,0.7)',
                           cursor: 'pointer',
-                          transition: 'all 0.2s ease'
+                          transition: 'all 0.2s ease',
+                          boxShadow: isMobile ? '0 2px 8px #0001' : 'none',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: 0,
+                          minWidth: 0,
+                          minHeight: 0,
                         }}
+                        aria-label={`Voir l'image ${index + 1}`}
                       />
                     ))}
                   </div>
                 )}
 
-                {/* Logo discret */}
-                <img 
-                  src={logo} 
-                  alt="BB YACHTS" 
-                  style={{ 
-                    position: 'absolute', 
-                    top: 20, 
-                    right: 20, 
-                    height: 40,
-                    opacity: 0.8,
-                    zIndex: 10
-                  }} 
-                />
+                
               </div>
             )}
 
             {/* Caractéristiques sobres */}
             <div style={{ 
-              padding: '40px',
+              padding: isMobile ? '24px 8px' : '40px',
               borderBottom: '1px solid #e9ecef'
             }}>
               <h3 style={{ 
-                fontSize: 20, 
+                fontSize: isMobile ? 15 : 20, 
                 fontWeight: 600, 
                 color: '#343a40', 
-                marginBottom: 30,
+                marginBottom: isMobile ? 16 : 30,
                 textAlign: 'center'
               }}>
                 Caractéristiques
               </h3>
-              
               <div style={{ 
                 display: 'grid', 
-                gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', 
-                gap: 20
+                gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)', 
+                gap: isMobile ? 10 : 20
               }}>
                 <div style={{
                   textAlign: 'center',
@@ -454,15 +485,15 @@ export default function BateauDetails() {
             {/* Section Services Supplémentaires */}
             {servicesDisponibles.length > 0 && (
               <div style={{ 
-                padding: '40px',
+                padding: isMobile ? '24px 8px' : '40px',
                 borderBottom: '1px solid #e9ecef',
                 backgroundColor: '#ffffff'
               }}>
                 <h3 style={{ 
-                  fontSize: 20, 
+                  fontSize: isMobile ? 15 : 20, 
                   fontWeight: 600, 
                   color: '#343a40', 
-                  marginBottom: 30,
+                  marginBottom: isMobile ? 16 : 30,
                   textAlign: 'center'
                 }}>
                   Services Supplémentaires
@@ -470,16 +501,15 @@ export default function BateauDetails() {
                 <p style={{ 
                   textAlign: 'center',
                   color: '#6c757d',
-                  marginBottom: 30,
-                  fontSize: 14
+                  marginBottom: isMobile ? 16 : 30,
+                  fontSize: isMobile ? 12 : 14
                 }}>
                   Sélectionnez les services additionnels pour enrichir votre expérience
                 </p>
-                
                 <div style={{ 
                   display: 'grid', 
                   gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(300px, 1fr))', 
-                  gap: 16,
+                  gap: isMobile ? 8 : 16,
                   maxWidth: 800,
                   margin: '0 auto'
                 }}>
@@ -646,15 +676,15 @@ export default function BateauDetails() {
             {/* Section Nos Services */}
             {tousLesServices.length > 0 && (
               <div style={{ 
-                padding: '40px',
+                padding: isMobile ? '24px 8px' : '40px',
                 borderBottom: '1px solid #e9ecef',
                 backgroundColor: '#ffffff'
               }}>
                 <h3 style={{ 
-                  fontSize: 20, 
+                  fontSize: isMobile ? 15 : 20, 
                   fontWeight: 600, 
                   color: '#343a40', 
-                  marginBottom: 30,
+                  marginBottom: isMobile ? 16 : 30,
                   textAlign: 'center'
                 }}>
                   Nos Services
@@ -662,16 +692,15 @@ export default function BateauDetails() {
                 <p style={{ 
                   textAlign: 'center',
                   color: '#6c757d',
-                  marginBottom: 30,
-                  fontSize: 14
+                  marginBottom: isMobile ? 16 : 30,
+                  fontSize: isMobile ? 12 : 14
                 }}>
                   Découvrez tous les services additionnels que nous proposons
                 </p>
-                
                 <div style={{ 
                   display: 'grid', 
                   gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(300px, 1fr))', 
-                  gap: 16,
+                  gap: isMobile ? 8 : 16,
                   maxWidth: 1000,
                   margin: '0 auto'
                 }}>
@@ -837,24 +866,23 @@ export default function BateauDetails() {
 
             {/* Formulaire de réservation sobre */}
             <div style={{ 
-              padding: '40px',
+              padding: isMobile ? '24px 8px' : '40px',
               backgroundColor: '#f8f9fa'
             }}>
               <div style={{ maxWidth: 600, margin: '0 auto' }}>
                 <h3 style={{ 
-                  fontSize: 24, 
+                  fontSize: isMobile ? 18 : 24, 
                   fontWeight: 600, 
-                  marginBottom: 30,
+                  marginBottom: isMobile ? 18 : 30,
                   textAlign: 'center',
                   color: '#343a40'
                 }}>
                   Réserver ce bateau
                 </h3>
-
                 <div style={{
                   backgroundColor: '#ffffff',
                   borderRadius: 8,
-                  padding: '25px',
+                  padding: isMobile ? '18px' : '25px',
                   border: '1px solid #e9ecef'
                 }}>
                   {/* Récapitulatif des prix */}
@@ -896,49 +924,55 @@ export default function BateauDetails() {
                   <button 
                     type="button" 
                     onClick={handleReservation}
+                    disabled={!isDateDebutValid}
                     style={{ 
                       width: '100%',
                       padding: '16px',
-                      backgroundColor: '#343a40',
+                      backgroundColor: !isDateDebutValid ? '#d1d5db' : '#343a40',
                       border: 'none',
                       borderRadius: 6,
-                      color: '#fff',
+                      color: !isDateDebutValid ? '#888' : '#fff',
                       fontSize: 16,
                       fontWeight: 600,
-                      cursor: 'pointer',
+                      cursor: !isDateDebutValid ? 'not-allowed' : 'pointer',
                       transition: 'background-color 0.2s ease'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = '#23272b';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = '#343a40';
                     }}
                   >
                     Confirmer la réservation
                   </button>
+                  {!isDateDebutValid && (
+                    <div style={{ color: '#e53e3e', marginTop: 12, textAlign: 'center', fontWeight: 600 }}>
+                      La date de début doit être aujourd'hui ou plus tard.
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           </div>
 
           {/* Section autres bateaux sobre */}
-          <div style={{
-            backgroundColor: '#ffffff',
-            borderRadius: 8,
-            padding: '40px',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
-            border: '1px solid #e9ecef',
-            marginTop: 30,
-            maxWidth: 1000,
-            margin: '30px auto 0'
-          }}>
+          <div
+            style={{
+              backgroundColor: '#fff',
+              borderRadius: isMobile ? 16 : 8,
+              padding: isMobile ? '12px 2px' : '40px',
+              boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
+              border: '1px solid #e9ecef',
+              marginTop: isMobile ? 16 : 30,
+              maxWidth: isMobile ? '99vw' : 1000,
+              margin: isMobile ? '8px auto' : '30px auto 0',
+              overflow: 'visible',
+              minWidth: 0,
+              width: isMobile ? '100%' : 'auto',
+              display: 'block',
+            }}
+          >
             <h3 style={{ 
-              fontSize: 24, 
+              fontSize: isMobile ? 18 : 24, 
               fontWeight: 600, 
               color: '#343a40',
               textAlign: 'center',
-              marginBottom: 40
+              marginBottom: isMobile ? 16 : 40
             }}>
               Autres bateaux disponibles
             </h3>
@@ -955,6 +989,7 @@ export default function BateauDetails() {
 // Composant AutresBateaux sobre
 function AutresBateaux({ currentId, ville, isMobile }) {
   const [bateaux, setBateaux] = React.useState([]);
+  const { t } = require('react-i18next').useTranslation();
   
   React.useEffect(() => {
     async function fetchBateaux() {
@@ -976,7 +1011,7 @@ function AutresBateaux({ currentId, ville, isMobile }) {
       padding: '40px 20px',
       color: '#6c757d'
     }}>
-      <p style={{ fontSize: 16, margin: 0 }}>Aucun autre bateau disponible dans cette ville.</p>
+      <p style={{ fontSize: 16, margin: 0 }}>{t('no_other_boat_in_city')}</p>
     </div>
   );
   
@@ -1007,7 +1042,7 @@ function AutresBateaux({ currentId, ville, isMobile }) {
                 e.currentTarget.style.boxShadow = 'none';
               }
             }}>
-            <div style={{ position: 'relative', height: 200 }}>
+            <div style={{ position: 'relative', height: isMobile ? 140 : 200, minHeight: 80 }}>
               {bateau.photo && bateau.photo[0] && (
                 <img 
                   src={bateau.photo[0]} 
@@ -1015,22 +1050,17 @@ function AutresBateaux({ currentId, ville, isMobile }) {
                   style={{ 
                     width: '100%', 
                     height: '100%', 
-                    objectFit: 'cover'
+                    objectFit: isMobile ? 'cover' : 'cover',
+                    borderRadius: isMobile ? 8 : 0,
+                    maxHeight: isMobile ? 140 : 200,
+                    minHeight: 80,
+                    background: '#fff',
+                    display: 'block',
                   }} 
                 />
               )}
-              <div style={{
-                position: 'absolute',
-                top: 12,
-                right: 12,
-                backgroundColor: '#343a40',
-                color: '#fff',
-                padding: '6px 12px',
-                borderRadius: 4,
-                fontSize: 14,
-                fontWeight: 600
-              }}>
-                {bateau.prix}€/jour
+              <div style={{ position: 'absolute', top: isMobile ? 10 : 12, right: isMobile ? 10 : 12, backgroundColor: '#343a40', color: '#fff', padding: isMobile ? '8px 16px' : '6px 12px', borderRadius: isMobile ? 12 : 4, fontSize: isMobile ? 16 : 14, fontWeight: 600, boxShadow: '0 2px 8px rgba(0,0,0,0.10)', letterSpacing: 0.5 }}>
+                {bateau.prix}{t('per_day')}
               </div>
             </div>
             
@@ -1053,15 +1083,15 @@ function AutresBateaux({ currentId, ville, isMobile }) {
               }}>
                 <div style={{ textAlign: 'center' }}>
                   <FaUserFriends style={{ marginBottom: 4 }} />
-                  <div>{bateau.places}</div>
+                  <div>{bateau.places} {t('passengers')}</div>
                 </div>
                 <div style={{ textAlign: 'center' }}>
                   <FaCogs style={{ marginBottom: 4 }} />
-                  <div>{bateau.moteur}cv</div>
+                  <div>{bateau.moteur} {t('power_unit')}</div>
                 </div>
                 <div style={{ textAlign: 'center' }}>
                   <FaTachometerAlt style={{ marginBottom: 4 }} />
-                  <div>{bateau.vitesse}kn</div>
+                  <div>{bateau.vitesse} {t('speed_unit')}</div>
                 </div>
               </div>
               
@@ -1076,7 +1106,7 @@ function AutresBateaux({ currentId, ville, isMobile }) {
                 fontWeight: 500,
                 transition: 'background-color 0.2s ease'
               }}>
-                Voir les détails
+                {t('see_details')}
               </div>
             </div>
           </div>

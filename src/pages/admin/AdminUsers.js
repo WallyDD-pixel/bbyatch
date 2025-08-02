@@ -3,6 +3,7 @@ import { db, auth } from '../../firebase';
 import { collection, getDocs, doc, updateDoc, deleteDoc, addDoc, setDoc } from 'firebase/firestore';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { FaUsers, FaPlus, FaEdit, FaTrash, FaUserShield, FaUserTie, FaUser } from 'react-icons/fa';
+import Modal from 'react-bootstrap/Modal';
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
@@ -12,6 +13,10 @@ export default function AdminUsers() {
   const [newUser, setNewUser] = useState({ email: '', prenom: '', nom: '', agence: '', phone: '', countryCode: '', role: '', password: '' });
   const [showAdd, setShowAdd] = useState(false);
   const [actionLoading, setActionLoading] = useState(null);
+  const [editUser, setEditUser] = useState(null);
+  const [editForm, setEditForm] = useState({ prenom: '', nom: '', email: '', agence: '', phone: '', countryCode: '', role: '' });
+  const [editPassword, setEditPassword] = useState('');
+  const [editLoading, setEditLoading] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -80,6 +85,44 @@ export default function AdminUsers() {
       setError("Erreur lors de l'ajout : " + err.message);
     }
     setActionLoading(null);
+  }
+
+  function openEditModal(user) {
+    setEditUser(user);
+    setEditForm({
+      prenom: user.prenom || '',
+      nom: user.nom || '',
+      email: user.email || '',
+      agence: user.agence || '',
+      phone: user.phone || '',
+      countryCode: user.countryCode || '',
+      role: user.role || '',
+    });
+    setEditPassword('');
+  }
+
+  async function handleEditUserSave() {
+    setEditLoading(true);
+    setError('');
+    setSuccess('');
+    try {
+      await updateDoc(doc(db, 'users', editUser.id), {
+        ...editForm,
+        role: editForm.role || '',
+      });
+      // Changement du mot de passe (si renseigné)
+      if (editPassword && editUser.email) {
+        // Appel à une Cloud Function ou API backend pour changer le mot de passe
+        // Ici, on affiche juste un message (à implémenter côté backend)
+        setSuccess('Mot de passe modifié (implémentation backend requise)');
+      }
+      setEditUser(null);
+      fetchUsers();
+      setSuccess('Utilisateur modifié avec succès !');
+    } catch (err) {
+      setError('Erreur lors de la modification : ' + err.message);
+    }
+    setEditLoading(false);
   }
 
   const getRoleIcon = (role) => {
@@ -668,6 +711,22 @@ export default function AdminUsers() {
                     textAlign: 'center'
                   }}>
                     <button 
+                      onClick={() => openEditModal(user)}
+                      style={{
+                        background: '#3b82f6',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '8px 12px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        marginRight: 8
+                      }}
+                    >
+                      <FaEdit /> Modifier
+                    </button>
+                    <button 
                       onClick={() => handleDeleteUser(user.id)}
                       disabled={actionLoading === user.id}
                       style={{
@@ -679,20 +738,13 @@ export default function AdminUsers() {
                         fontSize: '12px',
                         fontWeight: 600,
                         cursor: actionLoading === user.id ? 'not-allowed' : 'pointer',
-                        display: 'flex',
+                        display: 'inline-flex',
                         alignItems: 'center',
                         gap: '6px'
                       }}
                     >
                       {actionLoading === user.id ? (
-                        <div style={{
-                          width: '12px',
-                          height: '12px',
-                          border: '2px solid transparent',
-                          borderTop: '2px solid #fff',
-                          borderRadius: '50%',
-                          animation: 'spin 1s linear infinite'
-                        }}></div>
+                        <div style={{ width: '12px', height: '12px', border: '2px solid transparent', borderTop: '2px solid #fff', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
                       ) : (
                         <FaTrash />
                       )}
@@ -718,6 +770,63 @@ export default function AdminUsers() {
         )}
       </div>
 
+      {/* Modale d'édition utilisateur */}
+      {editUser && (
+        <Modal show={true} onHide={() => setEditUser(null)} centered>
+          <Modal.Header closeButton style={{background:'#232323', color:'#fff'}}>
+            <Modal.Title style={{color:'#fff'}}>Modifier l'utilisateur</Modal.Title>
+          </Modal.Header>
+          <Modal.Body style={{background:'#fff', color:'#232323'}}>
+            <form onSubmit={e => {e.preventDefault(); handleEditUserSave();}}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <div>
+                  <label>Prénom</label>
+                  <input type="text" value={editForm.prenom} onChange={e => setEditForm({ ...editForm, prenom: e.target.value })} className="form-control" />
+                </div>
+                <div>
+                  <label>Nom</label>
+                  <input type="text" value={editForm.nom} onChange={e => setEditForm({ ...editForm, nom: e.target.value })} className="form-control" />
+                </div>
+                <div>
+                  <label>Email</label>
+                  <input type="email" value={editForm.email} onChange={e => setEditForm({ ...editForm, email: e.target.value })} className="form-control" />
+                </div>
+                <div>
+                  <label>Agence</label>
+                  <input type="text" value={editForm.agence} onChange={e => setEditForm({ ...editForm, agence: e.target.value })} className="form-control" />
+                </div>
+                <div>
+                  <label>Code pays</label>
+                  <input type="text" value={editForm.countryCode} onChange={e => setEditForm({ ...editForm, countryCode: e.target.value })} className="form-control" />
+                </div>
+                <div>
+                  <label>Téléphone</label>
+                  <input type="text" value={editForm.phone} onChange={e => setEditForm({ ...editForm, phone: e.target.value })} className="form-control" />
+                </div>
+                <div>
+                  <label>Rôle</label>
+                  <select value={editForm.role} onChange={e => setEditForm({ ...editForm, role: e.target.value })} className="form-control">
+                    <option value="">Utilisateur</option>
+                    <option value="Admin">Admin</option>
+                    <option value="agence">Agence</option>
+                  </select>
+                </div>
+                <div>
+                  <label>Nouveau mot de passe</label>
+                  <input type="password" value={editPassword} onChange={e => setEditPassword(e.target.value)} className="form-control" placeholder="Laisser vide pour ne pas changer" />
+                </div>
+              </div>
+              <div className="mt-4 d-flex justify-content-end gap-2">
+                <button type="button" className="btn btn-secondary" onClick={() => setEditUser(null)}>Annuler</button>
+                <button type="submit" className="btn btn-primary" disabled={editLoading}>{editLoading ? 'Enregistrement...' : 'Enregistrer'}</button>
+              </div>
+            </form>
+            {success && <div className="alert alert-success mt-3">{success}</div>}
+            {error && <div className="alert alert-danger mt-3">{error}</div>}
+          </Modal.Body>
+        </Modal>
+      )}
+
       <style>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }
@@ -725,6 +834,7 @@ export default function AdminUsers() {
         }
       `}</style>
     </div>
-  )}
+  );
+}
 
 

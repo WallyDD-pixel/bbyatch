@@ -30,6 +30,16 @@ export default function AdminExperiences() {
   const [addExpSuccess, setAddExpSuccess] = useState('');
   const [uploadingExpImage, setUploadingExpImage] = useState(false);
 
+  // Ajout : charger tous les bateaux existants pour la sélection
+  const [allBateaux, setAllBateaux] = useState([]);
+  useEffect(() => {
+    async function fetchAllBateaux() {
+      const snap = await getDocs(collection(db, "bateaux"));
+      setAllBateaux(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }
+    fetchAllBateaux();
+  }, []);
+
   useEffect(() => {
     async function fetchExperiences() {
       setLoading(true);
@@ -280,21 +290,48 @@ export default function AdminExperiences() {
           )}
           {showAddBateau && (
             <div style={{ marginTop: 18, background: '#232733', border: '1px solid #374151', borderRadius: 10, padding: 18, maxWidth: 340 }}>
-              <h4 style={{ marginBottom: 12, fontSize: 18, color:'#10b981' }}>Ajouter un bateau</h4>
-              <input placeholder="Nom" value={form.nom} onChange={e => setForm(f => ({ ...f, nom: e.target.value }))} style={{ marginBottom: 8, width: '100%', padding: 8, borderRadius: 6, border: '1px solid #374151', background:'#181a20', color:'#e8eaed' }} />
-              <input placeholder="Prix (€)" type="number" value={form.prix} onChange={e => setForm(f => ({ ...f, prix: e.target.value }))} style={{ marginBottom: 8, width: '100%', padding: 8, borderRadius: 6, border: '1px solid #374151', background:'#181a20', color:'#e8eaed' }} />
-              {/* Input file simple pour image */}
-              <label style={{ color:'#e8eaed', fontWeight:600, marginBottom:4, display:'block' }}>Images du bateau</label>
-              <input type="file" accept="image/*" multiple onChange={handleFileUploadBateau} style={{ marginBottom: 8, width: '100%' }} />
-              {uploadingImages && <div style={{ color: '#10b981', marginBottom: 8 }}>Téléversement en cours...</div>}
-              {form.images && form.images.length > 0 && (
-                <div style={{ marginBottom: 8, textAlign: 'center', display:'flex', flexWrap:'wrap', gap:8 }}>
-                  {form.images.map((img, idx) => (
-                    <img key={idx} src={img} alt="Prévisualisation" style={{ maxWidth: 80, maxHeight: 60, borderRadius: 8, boxShadow: '0 2px 8px #0004' }} />
-                  ))}
+              <h4 style={{ marginBottom: 12, fontSize: 18, color:'#10b981' }}>Associer un bateau existant</h4>
+              <label style={{ color:'#e8eaed', fontWeight:600, marginBottom:4, display:'block' }}>Sélectionner un bateau</label>
+              <select value={form.bateauId || ''} onChange={e => setForm(f => ({ ...f, bateauId: e.target.value }))} style={{ marginBottom: 8, width: '100%', padding: 8, borderRadius: 6, border: '1px solid #374151', background:'#181a20', color:'#e8eaed' }}>
+                <option value="">-- Choisir --</option>
+                {allBateaux.map(b => (
+                  <option key={b.id} value={b.id}>{b.nom} - {b.Ville} ({b.places} places)</option>
+                ))}
+              </select>
+              {form.bateauId && (
+                <div style={{ marginBottom: 8, textAlign: 'center' }}>
+                  {(() => {
+                    const b = allBateaux.find(x => x.id === form.bateauId);
+                    return b && b.photo && b.photo[0] ? <img src={b.photo[0]} alt={b.nom} style={{ maxWidth: 80, maxHeight: 60, borderRadius: 8, boxShadow: '0 2px 8px #0004' }} /> : null;
+                  })()}
                 </div>
               )}
-              <button onClick={() => handleAddBateau(showBateaux)} style={{ background: '#1976d2', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontWeight: 700, cursor: 'pointer', marginTop: 8, boxShadow:'0 2px 8px #0002' }}>Ajouter</button>
+              <button onClick={async () => {
+                setAddError(''); setAddSuccess('');
+                if (!form.bateauId) {
+                  setAddError('Veuillez sélectionner un bateau');
+                  return;
+                }
+                try {
+                  // On associe le bateau à l'expérience (stocke l'id et les infos principales)
+                  const b = allBateaux.find(x => x.id === form.bateauId);
+                  await addDoc(collection(db, "experience", showBateaux, "bateaux"), {
+                    bateauId: b.id,
+                    nom: b.nom,
+                    prix: b.prix,
+                    image: b.photo && b.photo[0] ? b.photo[0] : '',
+                    places: b.places,
+                    moteur: b.moteur,
+                    Ville: b.Ville
+                  });
+                  setAddSuccess('Bateau associé !');
+                  setForm({ bateauId: '' });
+                  fetchBateauxForExperience(showBateaux);
+                  setShowAddBateau(false);
+                } catch (e) {
+                  setAddError('Erreur lors de l\'association');
+                }
+              }} style={{ background: '#1976d2', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontWeight: 700, cursor: 'pointer', marginTop: 8, boxShadow:'0 2px 8px #0002' }}>Associer</button>
               {addError && <div style={{ color: '#ef4444', marginTop: 8 }}>{addError}</div>}
               {addSuccess && <div style={{ color: '#10b981', marginTop: 8 }}>{addSuccess}</div>}
               <button onClick={() => setShowAddBateau(false)} style={{ marginTop: 8, background: '#232733', color: '#e8eaed', border: '1px solid #374151', borderRadius: 8, padding: '6px 14px', fontWeight: 600, cursor: 'pointer' }}>Annuler</button>

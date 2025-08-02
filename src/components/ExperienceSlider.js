@@ -4,10 +4,13 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
+import { useTranslation } from 'react-i18next';
 
 export default function ExperienceSlider() {
 	const [experiences, setExperiences] = useState([]);
 	const [loading, setLoading] = useState(true);
+
+	const { i18n } = useTranslation();
 
 	useEffect(() => {
 		const fetchExperiences = async () => {
@@ -116,92 +119,109 @@ export default function ExperienceSlider() {
 					WebkitOverflowScrolling: "touch"
 				}}
 			>
-				{toDisplay.map((exp) => (
-					<div
-						key={exp.id}
-						style={{
-							minWidth: window.innerWidth < 768 ? 260 : 340,
-							maxWidth: 400,
-							flex: "1 0 320px",
-							padding: 0,
-							background: "#fff",
-							borderRadius: 24,
-							boxShadow: "0 6px 32px #0001",
-							border: "1.5px solid #e5e7eb",
-							overflow: "hidden",
-							transition: "box-shadow 0.2s, transform 0.2s",
-							cursor: "pointer",
-							position: "relative",
-							scrollSnapAlign: window.innerWidth < 768 ? "start" : undefined
-						}}
-						onClick={e => {
+		{toDisplay.map((exp) => {
+			const lang = (typeof i18n !== 'undefined' && i18n.language) ? i18n.language : 'fr';
+			const nom = typeof exp.nom === 'object' ? exp.nom[lang] : exp.nom || (typeof exp.titre === 'object' ? exp.titre[lang] : exp.titre);
+			const description = typeof exp.description === 'object' ? exp.description[lang] : exp.description;
+			const info = typeof exp.info === 'object' ? exp.info[lang] : exp.info;
+			const date = typeof exp.Date === 'object' ? exp.Date[lang] : exp.Date;
+			return (
+				<div
+					key={exp.id}
+					style={{
+						minWidth: window.innerWidth < 768 ? 260 : 340,
+						maxWidth: 400,
+						flex: "1 0 320px",
+						padding: 0,
+						background: "#fff",
+						borderRadius: 24,
+						boxShadow: "0 6px 32px #0001",
+						border: "1.5px solid #e5e7eb",
+						overflow: "hidden",
+						transition: "box-shadow 0.2s, transform 0.2s",
+						cursor: "pointer",
+						position: "relative",
+						scrollSnapAlign: window.innerWidth < 768 ? "start" : undefined
+					}}
+					onClick={e => {
+						e.stopPropagation();
+						window.location.href = `/experiencepage/${exp.id}`;
+					}}
+					tabIndex={0}
+					role="button"
+					onKeyDown={e => {
+						if (e.key === "Enter" || e.key === " ") {
 							e.stopPropagation();
 							window.location.href = `/experiencepage/${exp.id}`;
-						}}
-						tabIndex={0}
-						role="button"
-						onKeyDown={e => {
-							if (e.key === "Enter" || e.key === " ") {
-								e.stopPropagation();
-								window.location.href = `/experiencepage/${exp.id}`;
-							}
-						}}
-					>
+						}
+					}}
+				>
+					<div style={{
+						width: "100%",
+						height: window.innerWidth < 768 ? 160 : 200,
+						background: `url(${exp.image}) center/cover no-repeat`,
+						borderTopLeftRadius: 24,
+						borderTopRightRadius: 24,
+						position: "relative"
+					}}>
 						<div style={{
+							position: "absolute",
+							top: 0,
+							left: 0,
 							width: "100%",
-							height: window.innerWidth < 768 ? 160 : 200,
-							background: `url(${exp.image}) center/cover no-repeat`,
+							height: "100%",
+							background: window.innerWidth < 768
+								? "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.5) 100%)"
+								: "linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.35) 100%)",
+							zIndex: 1,
 							borderTopLeftRadius: 24,
-							borderTopRightRadius: 24,
-							position: "relative"
-						}}>
-							<div style={{
-								position: "absolute",
-								top: 0,
-								left: 0,
-								width: "100%",
-								height: "100%",
-								background: window.innerWidth < 768
-									? "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.5) 100%)"
-									: "linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.35) 100%)",
-								zIndex: 1,
-								borderTopLeftRadius: 24,
-								borderTopRightRadius: 24
-							}} />
-						</div>
-						<div style={{
-							padding: window.innerWidth < 768 ? "18px 16px 22px 16px" : "28px 24px 24px 24px",
-							display: "flex",
-							flexDirection: "column",
-							alignItems: "flex-start",
-							justifyContent: "flex-start",
-							height: "auto",
-							background: "#fff"
-						}}>
-							<h5 style={{
-								fontWeight: 800,
-								fontSize: window.innerWidth < 768 ? 18 : 22,
-								color: "#232323",
-								marginBottom: 12,
-								letterSpacing: -0.5,
-								textShadow: "0 2px 8px #23232311"
-							}}>
-								{exp.nom || exp.titre}
-							</h5>
-							<p style={{
-								fontSize: window.innerWidth < 768 ? 14 : 16,
-								color: "#555",
-								lineHeight: 1.6,
-								marginBottom: 0,
-								fontWeight: 500,
-								opacity: 0.95
-							}}>
-								{exp.description}
-							</p>
-						</div>
-						{/* Bulle expérience supprimée */}
+							borderTopRightRadius: 24
+						}} />
 					</div>
-				))}
+					<div style={{
+						padding: window.innerWidth < 768 ? "18px 16px 22px 16px" : "28px 24px 24px 24px",
+						display: "flex",
+						flexDirection: "column",
+						alignItems: "flex-start",
+						justifyContent: "flex-start",
+						height: "auto",
+						background: "#fff"
+					}}>
+						<h5 style={{
+							fontWeight: 800,
+							fontSize: window.innerWidth < 768 ? 18 : 22,
+							color: "#232323",
+							marginBottom: 12,
+							letterSpacing: -0.5,
+							textShadow: "0 2px 8px #23232311"
+						}}>
+							{nom}
+						</h5>
+						<p style={{
+							fontSize: window.innerWidth < 768 ? 14 : 16,
+							color: "#555",
+							lineHeight: 1.6,
+							marginBottom: 0,
+							fontWeight: 500,
+							opacity: 0.95
+						}}>
+							{description}
+						</p>
+						{info && (
+							<div style={{ fontSize: 13, color: '#888', marginTop: 8, marginBottom: 0, fontWeight: 400, opacity: 0.9 }}>
+								{info}
+							</div>
+						)}
+						{date && (
+							<div style={{ fontSize: 13, color: '#888', marginTop: 4, marginBottom: 0, fontWeight: 400, opacity: 0.9 }}>
+								{date}
+							</div>
+						)}
+					</div>
+					{/* Bulle expérience supprimée */}
+				</div>
+			);
+		})}
 			</div>
 			{/* Styles personnalisés pour le scroll horizontal */}
 			<style>{`

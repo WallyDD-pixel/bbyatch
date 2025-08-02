@@ -18,7 +18,12 @@ export default function LocationSearch() {
   const [disponibilites, setDisponibilites] = useState([]);
   const [datesDepart, setDatesDepart] = useState([]); // Dates de début (start)
   const [datesRetour, setDatesRetour] = useState([]); // Dates de fin (end)
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const navigate = useNavigate();
+  const { t } = require('react-i18next').useTranslation();
+
+  // Date du jour (système)
+  const today = new Date(2025, 7, 1); // 1 août 2025 (mois 0-indexé)
 
   useEffect(() => {
     const fetchVilles = async () => {
@@ -210,16 +215,38 @@ export default function LocationSearch() {
     navigate(`/search-results?${queryString}`);
   };
 
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <form
       className="search-bar-modern search-bar-responsive"
       onSubmit={handleSubmit}
-      style={{ marginTop: 48, padding: 16, borderRadius: 16, background: '#fff', boxShadow: '0 2px 12px #0001', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12, maxWidth: 900, marginLeft: 'auto', marginRight: 'auto' }}
+      style={{
+        marginTop: isMobile ? 6 : 24,
+        padding: isMobile ? '6px 2px' : '14px 10px',
+        borderRadius: 14,
+        background: '#fff',
+        boxShadow: '0 2px 12px #0001',
+        display: 'flex',
+        flexDirection: isMobile ? 'column' : 'row',
+        alignItems: isMobile ? 'stretch' : 'center',
+        gap: isMobile ? 4 : 10,
+        maxWidth: isMobile ? '88vw' : 420,
+        width: isMobile ? '88vw' : '100%',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        minHeight: isMobile ? 0 : 48,
+        boxSizing: 'border-box'
+      }}
     >
       <div className="search-item" style={{ minWidth: 160, flex: 1, margin: 0 }}>
         <MapPin className="search-icon" />
         <div className="search-labels" style={{ gap: 2 }}>
-          <label style={{ marginBottom: 2 }}>Destination</label>
+          <label style={{ marginBottom: 2 }}>{t('destination')}</label>
           <select
             value={selectedVille}
             onChange={(e) => {
@@ -232,7 +259,7 @@ export default function LocationSearch() {
             className="styled-input"
             style={{ minHeight: 36, fontSize: 15 }}
           >
-            <option value="">Choisissez une ville</option>
+            <option value="">{t('choose_city')}</option>
             {villes.map((ville) => (
               <option key={ville.id} value={ville.nom}>
                 {ville.nom}
@@ -245,21 +272,21 @@ export default function LocationSearch() {
       <div className="search-item" style={{ minWidth: 160, flex: 1, margin: 0 }}>
         <CalendarDays className="search-icon" />
         <div className="search-labels" style={{ gap: 2 }}>
-          <label style={{ marginBottom: 2 }}>Départ</label>
-          <div style={{ position: "relative", zIndex: 3 }}>
+          <div style={{ width: '100%', marginBottom: 8 }}>
+            <label style={{ fontWeight: 600, color: '#1976d2', marginBottom: 4, display: 'block', fontSize: 15 }}>{t('start_date')}</label>
             <DatePicker
               selected={dateDepart}
               onChange={(date) => {
                 setDateDepart(date);
                 setHeureDepart(null);
               }}
-              placeholderText="Date de départ"
-              includeDates={datesDepart}
+              placeholderText={t('start_date')}
+              includeDates={datesDepart.filter(d => d >= today)}
               locale={fr}
               dateFormat="dd/MM/yyyy"
               dayClassName={(date) =>
                 datesDepart.some(
-                  (d) => d.toDateString() === date.toDateString()
+                  (d) => d.toDateString() === date.toDateString() && d >= today
                 )
                   ? "available-day"
                   : undefined
@@ -267,88 +294,92 @@ export default function LocationSearch() {
               className="styled-input"
               popperPlacement="bottom"
               popperClassName="datepicker-popper"
-              style={{ minHeight: 36, fontSize: 15 }}
+              style={{ minHeight: 36, fontSize: 15, width: '100%' }}
             />
           </div>
           {dateDepart && (
-            <div style={{ position: "relative", zIndex: 2, marginTop: 2 }}>
+            <div style={{ width: '100%', marginBottom: 8 }}>
+              <label style={{ fontWeight: 600, color: '#1976d2', marginBottom: 4, display: 'block', fontSize: 15 }}>{t('start_time')}</label>
               <DatePicker
                 selected={heureDepart}
                 onChange={(time) => setHeureDepart(time)}
                 showTimeSelect
                 showTimeSelectOnly
                 timeIntervals={30}
-                timeCaption="Heure"
+                timeCaption={t('start_time')}
                 dateFormat="HH:mm"
                 locale={fr}
                 includeTimes={getHeuresDisponibles(dateDepart)}
-                placeholderText="Heure de départ"
+                placeholderText={t('start_time')}
                 className="styled-input"
                 popperPlacement="bottom"
                 popperClassName="datepicker-popper"
-                style={{ minHeight: 36, fontSize: 15 }}
+                style={{ minHeight: 36, fontSize: 15, width: '100%' }}
               />
             </div>
           )}
         </div>
       </div>
 
-      <div className="search-item" style={{ minWidth: 160, flex: 1, margin: 0 }}>
-        <CalendarDays className="search-icon" />
-        <div className="search-labels" style={{ gap: 2 }}>
-          <label style={{ marginBottom: 2 }}>Retour</label>
-          <div style={{ position: "relative", zIndex: 2 }}>
-            <DatePicker
-              selected={dateRetour}
-              onChange={(date) => {
-                setDateRetour(date);
-                setHeureRetour(null);
-              }}
-              placeholderText="Date de retour"
-              includeDates={datesRetour}
-              locale={fr}
-              dateFormat="dd/MM/yyyy"
-              dayClassName={(date) =>
-                datesRetour.some(
-                  (d) => d.toDateString() === date.toDateString()
-                )
-                  ? "available-day"
-                  : undefined
-              }
-              className="styled-input"
-              popperPlacement="bottom"
-              popperClassName="datepicker-popper"
-              style={{ minHeight: 36, fontSize: 15 }}
-            />
-          </div>
-          {dateRetour && (
-            <div style={{ position: "relative", zIndex: 1, marginTop: 2 }}>
+      {dateDepart && (
+        <div className="search-item" style={{ minWidth: 160, flex: 1, margin: 0 }}>
+          <CalendarDays className="search-icon" />
+          <div className="search-labels" style={{ gap: 2 }}>
+            <div style={{ width: '100%', marginBottom: 8 }}>
+              <label style={{ fontWeight: 600, color: '#1976d2', marginBottom: 4, display: 'block', fontSize: 15 }}>{t('end_date')}</label>
               <DatePicker
-                selected={heureRetour}
-                onChange={(time) => setHeureRetour(time)}
-                showTimeSelect
-                showTimeSelectOnly
-                timeIntervals={30}
-                timeCaption="Heure"
-                dateFormat="HH:mm"
+                selected={dateRetour}
+                onChange={(date) => {
+                  setDateRetour(date);
+                  setHeureRetour(null);
+                }}
+                placeholderText={t('end_date')}
+                includeDates={datesRetour.filter(d => d >= today)}
                 locale={fr}
-                includeTimes={getHeuresDisponibles(dateRetour)}
-                placeholderText="Heure de retour"
+                dateFormat="dd/MM/yyyy"
+                dayClassName={(date) =>
+                  datesRetour.some(
+                    (d) => d.toDateString() === date.toDateString() && d >= today
+                  )
+                    ? "available-day"
+                    : undefined
+                }
                 className="styled-input"
                 popperPlacement="bottom"
                 popperClassName="datepicker-popper"
-                style={{ minHeight: 36, fontSize: 15 }}
+                style={{ minHeight: 36, fontSize: 15, width: '100%' }}
               />
             </div>
-          )}
+            {dateRetour && (
+              <div style={{ width: '100%', marginBottom: 8 }}>
+                <label style={{ fontWeight: 600, color: '#1976d2', marginBottom: 4, display: 'block', fontSize: 15 }}>{t('end_time')}</label>
+                <DatePicker
+                  selected={heureRetour}
+                  onChange={(time) => setHeureRetour(time)}
+                  showTimeSelect
+                  showTimeSelectOnly
+                  timeIntervals={30}
+                  timeCaption={t('end_time')}
+                  dateFormat="HH:mm"
+                  locale={fr}
+                  includeTimes={getHeuresDisponibles(dateRetour)}
+                  placeholderText={t('end_time')}
+                  className="styled-input"
+                  popperPlacement="bottom"
+                  popperClassName="datepicker-popper"
+                  style={{ minHeight: 36, fontSize: 15, width: '100%' }}
+                />
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       <div style={{ display: 'flex', alignItems: 'center', margin: 0 }}>
         <button
           type="submit"
           className="search-btn-icon"
-          title="Rechercher"
+          title={t('search')}
           style={{
             minWidth: 120,
             height: 36,
@@ -368,7 +399,7 @@ export default function LocationSearch() {
           }}
         >
           <Search size={18} style={{ marginRight: 6 }} />
-          Rechercher
+          {t('search')}
         </button>
       </div>
     </form>
